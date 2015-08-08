@@ -626,6 +626,7 @@ END;
 			'event' => 0,
 			'doing' => 0,
 			'blog' => 0,
+			'bwzt' => 0,
 			'album' => 0,
 			'share' => 0,
 			'poll' => 0
@@ -633,6 +634,7 @@ END;
 		'feed' => array(
 			'doing' => 1,
 			'blog' => 1,
+			'bwzt' => 1,
 			'upload' => 1,
 			'share' => 1,
 			'poll' => 1,
@@ -671,7 +673,7 @@ END;
 		"('allowrewrite', '0')",
 		"('allowwatermark', '0')",
 		"('allowftp', '0')",
-		"('holddomain', 'www|*blog*|*space*|x')",
+		"('holddomain', 'www|*blog*|*bwzt*|*space*|x')",
 		"('mtagminnum', '5')",
 		"('feedday', '7')",
 		"('feedmaxnum', '100')",
@@ -699,6 +701,7 @@ END;
 		"('name_allowpoke', '1')",
 		"('name_allowdoing', '1')",
 		"('name_allowblog', '0')",
+		"('name_allowbwzt', '0')",
 		"('name_allowalbum', '0')",
 		"('name_allowthread', '0')",
 		"('name_allowshare', '0')",
@@ -769,7 +772,7 @@ END;
 	$datas['allowtopic'] = array(1, 1, 0, 0, 0, 0, 0, 0, 0);
 	$datas['allowstat'] = array(1, 1, 0, 0, 0, 0, 0, 0, 0);
 	
-	foreach (array('comment','blog','poll','doing','upload','share','mtag','thread','post','poke','friend','click','event','magic', 'pm', 'myop') as $value) {
+	foreach (array('comment','blog','bwzt','poll','doing','upload','share','mtag','thread','post','poke','friend','click','event','magic', 'pm', 'myop') as $value) {
 		$datas['allow'.$value] = array(1, 1, 1, 0, 1, 1, 1, 0, 0);
 	}
 
@@ -780,7 +783,7 @@ END;
 	}
 
 	//信息管理
-	foreach (array('tag','mtag','feed','share','doing', 'blog','album','comment','thread', 'event', 'poll') as $value) {
+	foreach (array('tag','mtag','feed','share','doing', 'blog', 'bwzt','album','comment','thread', 'event', 'poll') as $value) {
 		$datas['manage'.$value] = array(1, 1, 0, 0, 0, 0, 0, 0, 0);
 	}
 
@@ -816,6 +819,7 @@ END;
 	$ruls[] = "('被留言', 'getguestbook', '1', '0', '5', '1', '1', '2', '0')";
 	$ruls[] = "('发表记录', 'doing', '1', '0', '5', '1', '1', '0', '1')";
 	$ruls[] = "('发表日志', 'publishblog', '1', '0', '3', '1', '5', '0', '5')";
+	$ruls[] = "('发表咨询', 'publishbwzt', '1', '0', '3', '1', '5', '0', '5')";
 	$ruls[] = "('上传图片', 'uploadimage', '1', '0', '10', '1', '2', '0', '2')";
 	$ruls[] = "('拍大头贴', 'camera', '1', '0', '5', '1', '3', '0', '3')";
 	$ruls[] = "('发表话题', 'publishthread', '1', '0', '5', '1', '5', '0', '5')";
@@ -838,8 +842,10 @@ END;
 	$ruls[] = "('获取邀请码', 'invitecode', '0', '0', '1', '0', '0', '0', '0')";
 	$ruls[] = "('搜索一次', 'search', '0', '0', '1', '0', '1', '0', '0')";
 	$ruls[] = "('日志导入', 'blogimport', '0', '0', '1', '0', '10', '0', '0')";
+	$ruls[] = "('咨询导入', 'bwztimport', '0', '0', '1', '0', '10', '0', '0')";
 	$ruls[] = "('修改域名', 'modifydomain', '0', '0', '1', '0', '5', '0', '0')";
 	$ruls[] = "('日志被删除', 'delblog', '0', '0', '1', '0', '10', '0', '10')";
+	$ruls[] = "('咨询被删除', 'delbwzt', '0', '0', '1', '0', '10', '0', '10')";
 	$ruls[] = "('记录被删除', 'deldoing', '0', '0', '1', '0', '2', '0', '2')";
 	$ruls[] = "('图片被删除', 'delimage', '0', '0', '1', '0', '4', '0', '4')";
 	$ruls[] = "('投票被删除', 'delpoll', '0', '0', '1', '0', '4', '0', '4')";
@@ -872,6 +878,7 @@ END;
 	//随便看看
 	$network = array(
 		'blog' => array('hot1'=>3, 'cache'=>600),
+		'bwzt' => array('hot1'=>3, 'cache'=>600),
 		'pic' => array('hot1'=>3, 'cache'=>700),
 		'thread' => array('hot1'=>3, 'cache'=>800),
 		'event' => array('cache'=>900),
@@ -895,6 +902,7 @@ END;
 	$datas[] = "1, '更新一下自己的头像', '头像就是你在这里的个人形象。<br>设置自己的头像后，会让更多的朋友记住您。', 'avatar.php', 1, '', 0, 20, 'image/task/avatar.gif'";
 	$datas[] = "1, '将个人资料补充完整', '把自己的个人资料填写完整吧。<br>这样您会被更多的朋友找到的，系统也会帮您找到朋友。', 'profile.php', '', 2, 0, 20, 'image/task/profile.gif'";
 	$datas[] = "1, '发表自己的第一篇日志', '现在，就写下自己的第一篇日志吧。<br>与大家一起分享自己的生活感悟。', 'blog.php', 3, '', 0, 5, 'image/task/blog.gif'";
+	$datas[] = "1, '发表自己的第一篇咨询', '现在，就写下自己的第一篇咨询吧。<br>与大家一起分享自己的生活感悟。', 'bwzt.php', 3, '', 0, 5, 'image/task/bwzt.gif'";
 	$datas[] = "1, '寻找并添加五位好友', '有了好友，您发的日志、图片等会被好友及时看到并传播出去；<br>您也会在首页方便及时的看到好友的最新动态。', 'friend.php', 4, '', 0, 50, 'image/task/friend.gif'";
 	$datas[] = "1, '验证激活自己的邮箱', '填写自己真实的邮箱地址并验证通过。<br>您可以在忘记密码的时候使用该邮箱取回自己的密码；<br>还可以及时接受站内的好友通知等等。', 'email.php', 5, '', 0, 10, 'image/task/email.gif'";
 	$datas[] = "1, '邀请10个新朋友加入', '邀请一下自己的QQ好友或者邮箱联系人，让亲朋好友一起来加入我们吧。', 'invite.php', 6, '', 0, 100, 'image/task/friend.gif'";
