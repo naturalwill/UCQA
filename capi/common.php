@@ -6,7 +6,7 @@
 
 @define('IN_UCHOME', TRUE);
 define('D_BUG', '1');
-//ÊÇ·ñÃ¿´Î¶¼×Ô¶¯¸üĞÂÄ£°å»º´æ
+//æ˜¯å¦æ¯æ¬¡éƒ½è‡ªåŠ¨æ›´æ–°æ¨¡æ¿ç¼“å­˜
 define('Flash_Template', '1');
 
 D_BUG?error_reporting(7):error_reporting(0);
@@ -14,36 +14,38 @@ set_magic_quotes_runtime(0);
 
 $_SGLOBAL = $_SCONFIG = $_SBLOCK = $_TPL = $_SCOOKIE = $_SN = $space = array();
 
-//³ÌĞòÄ¿Â¼
-define('S_ROOT', dirname(__FILE__).DIRECTORY_SEPARATOR);
+//ç¨‹åºç›®å½•
+//define('S_ROOT', dirname(__FILE__).DIRECTORY_SEPARATOR);
+define('S_ROOT', dirname(__FILE__).DIRECTORY_SEPARATOR .'..'.DIRECTORY_SEPARATOR);
 
-//»ù±¾ÎÄ¼ş
+//åŸºæœ¬æ–‡ä»¶
 include_once(S_ROOT.'./ver.php');
 if(!@include_once(S_ROOT.'./config.php')) {
-	header("Location: install/index.php");//°²×°
+	header("Location: install/index.php");//å®‰è£…
 	exit();
 }
 include_once(S_ROOT.'./source/function_common.php');
-
-//Ê±¼ä
+//add capi
+include_once(S_ROOT.'./capi/function_capi.php');
+//æ—¶é—´
 $mtime = explode(' ', microtime());
 $_SGLOBAL['timestamp'] = $mtime[1];
 $_SGLOBAL['supe_starttime'] = $_SGLOBAL['timestamp'] + $mtime[0];
 
-//GPC¹ıÂË
+//GPCè¿‡æ»¤
 $magic_quote = get_magic_quotes_gpc();
 if(empty($magic_quote)) {
 	$_GET = saddslashes($_GET);
 	$_POST = saddslashes($_POST);
 }
 
-//±¾Õ¾URL
+//æœ¬ç«™URL
 if(empty($_SC['siteurl'])) $_SC['siteurl'] = getsiteurl();
 
-//Á´½ÓÊı¾İ¿â
+//é“¾æ¥æ•°æ®åº“
 dbconnect();
 
-//»º´æÎÄ¼ş
+//ç¼“å­˜æ–‡ä»¶
 if(!@include_once(S_ROOT.'./data/data_config.php')) {
 	include_once(S_ROOT.'./source/function_cache.php');
 	config_cache();
@@ -61,14 +63,14 @@ foreach($_COOKIE as $key => $val) {
 	}
 }
 
-//ÆôÓÃGIP
+//å¯ç”¨GIP
 if ($_SC['gzipcompress'] && function_exists('ob_gzhandler')) {
 	ob_start('ob_gzhandler');
 } else {
 	ob_start();
 }
 
-//³õÊ¼»¯
+//åˆå§‹åŒ–
 $_SGLOBAL['supe_uid'] = 0;
 $_SGLOBAL['supe_username'] = '';
 $_SGLOBAL['inajax'] = empty($_GET['inajax'])?0:intval($_GET['inajax']);
@@ -77,11 +79,11 @@ $_SGLOBAL['ajaxmenuid'] = empty($_GET['ajaxmenuid'])?'':$_GET['ajaxmenuid'];
 $_SGLOBAL['refer'] = empty($_SERVER['HTTP_REFERER'])?'':$_SERVER['HTTP_REFERER'];
 if(empty($_GET['m_timestamp']) || $_SGLOBAL['mobile'] != md5($_GET['m_timestamp']."\t".$_SCONFIG['sitekey'])) $_SGLOBAL['mobile'] = '';
 
-//µÇÂ¼×¢²á·À¹àË®»ú
+//ç™»å½•æ³¨å†Œé˜²çŒæ°´æœº
 if(empty($_SCONFIG['login_action'])) $_SCONFIG['login_action'] = md5('login'.md5($_SCONFIG['sitekey']));
 if(empty($_SCONFIG['register_action'])) $_SCONFIG['register_action'] = md5('register'.md5($_SCONFIG['sitekey']));
 
-//ÕûÕ¾·ç¸ñ
+//æ•´ç«™é£æ ¼
 if(empty($_SCONFIG['template'])) {
 	$_SCONFIG['template'] = 'default';
 }
@@ -94,7 +96,7 @@ if($_SCOOKIE['mytemplate']) {
 	}
 }
 
-//´¦ÀíREQUEST_URI
+//å¤„ç†REQUEST_URI
 if(!isset($_SERVER['REQUEST_URI'])) {  
 	$_SERVER['REQUEST_URI'] = $_SERVER['PHP_SELF'];
 	if(isset($_SERVER['QUERY_STRING'])) $_SERVER['REQUEST_URI'] .= '?'.$_SERVER['QUERY_STRING'];
@@ -105,15 +107,16 @@ if($_SERVER['REQUEST_URI']) {
 		$_GET = shtmlspecialchars($_GET);//XSS
 	}
 }
-	
-//ÅĞ¶ÏÓÃ»§µÇÂ¼×´Ì¬
+
+$_REQUEST['m_auth'] = rawurldecode($_REQUEST['m_auth']);
+//åˆ¤æ–­ç”¨æˆ·ç™»å½•çŠ¶æ€
 checkauth();
 $_SGLOBAL['uhash'] = md5($_SGLOBAL['supe_uid']."\t".substr($_SGLOBAL['timestamp'], 0, 6));
 
-//ÓÃ»§²Ëµ¥
+//ç”¨æˆ·èœå•
 getuserapp();
 
-//´¦ÀíUCÓ¦ÓÃ
+//å¤„ç†UCåº”ç”¨
 $_SCONFIG['uc_status'] = 0;
 $_SGLOBAL['appmenus'] = $_SGLOBAL['appmenu'] = array();
 if($_SGLOBAL['app']) {
