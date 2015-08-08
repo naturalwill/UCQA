@@ -25,13 +25,13 @@ if(empty($_SGLOBAL['supe_uid'])) {
 	} else {
 		ssetcookie('_refer', rawurlencode('cp.php?ac='.$ac));
 	}
-	showmessage('to_login', 'do.php?ac='.$_SCONFIG['login_action']);
+	capi_showmessage_by_data('to_login');
 }
 
 //获取空间信息
 $space = getspace($_SGLOBAL['supe_uid']);
 if(empty($space)) {
-	showmessage('space_does_not_exist');
+	capi_showmessage_by_data('space_does_not_exist');
 }
 
 //是否关闭站点
@@ -39,22 +39,22 @@ if(!in_array($ac, array('common', 'pm'))) {
 	checkclose();
 	//空间被锁定
 	if($space['flag'] == -1) {
-		showmessage('space_has_been_locked');
+		capi_showmessage_by_data('space_has_been_locked');
 	}
 	//禁止访问
 	if(checkperm('banvisit')) {
 		ckspacelog();
-		showmessage('you_do_not_have_permission_to_visit');
+		capi_showmessage_by_data('you_do_not_have_permission_to_visit');
 	}
 	//验证是否有权限玩应用
 	if($ac =='userapp' && !checkperm('allowmyop')) {
-		showmessage('no_privilege');
+		capi_showmessage_by_data('no_privilege');
 	}
 }
 
 //菜单
 $actives = array($ac => ' class="active"');
 
-include_once(S_ROOT.'./source/cp_'.$ac.'.php');
+include_once(S_ROOT.'./capi/source/cp_'.$ac.'.php');
 
 ?>

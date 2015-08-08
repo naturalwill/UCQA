@@ -71,7 +71,7 @@ if($space) {
 	
 	//验证空间是否被锁定
 	if($space['flag'] == -1) {
-		showmessage('space_has_been_locked');
+		capi_showmessage_by_data('space_has_been_locked');
 	}
 	
 	//隐私检查
@@ -101,7 +101,7 @@ if($space) {
 	//判断当前用户是否删除
 	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('spacelog')." WHERE uid='$uid' AND flag='-1'");
 	if($value = $_SGLOBAL['db']->fetch_array($query)) {
-		showmessage('the_space_has_been_closed');
+		capi_showmessage_by_data('the_space_has_been_closed');
 	}
 	
 	//未开通空间
@@ -124,13 +124,13 @@ if($_SGLOBAL['supe_uid']) {
 	getmember(); //获取当前用户信息
 	
 	if($_SGLOBAL['member']['flag'] == -1) {
-		showmessage('space_has_been_locked');
+		capi_showmessage_by_data('space_has_been_locked');
 	}
 	
 	//禁止访问
 	if(checkperm('banvisit')) {
 		ckspacelog();
-		showmessage('you_do_not_have_permission_to_visit');
+		capi_showmessage_by_data('you_do_not_have_permission_to_visit');
 	}
 	
 	updatetable('session', array('lastactivity' => $_SGLOBAL['timestamp']), array('uid'=>$_SGLOBAL['supe_uid']));
@@ -143,6 +143,6 @@ if(!empty($_SCONFIG['cronnextrun']) && $_SCONFIG['cronnextrun'] <= $_SGLOBAL['ti
 }
 
 //处理
-include_once(S_ROOT."./source/space_{$do}.php");
+include_once(S_ROOT."./capi/source/space_{$do}.php");
 
 ?>

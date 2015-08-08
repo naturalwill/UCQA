@@ -26,7 +26,7 @@ if($id) {
 	$bwzt = $_SGLOBAL['db']->fetch_array($query);
 	//日志不存在
 	if(empty($bwzt)) {
-		showmessage('view_to_info_did_not_exist');
+		capi_showmessage_by_data('view_to_info_did_not_exist');
 	}
 	//检查好友权限
 	if(!ckfriend($bwzt['uid'], $bwzt['friend'], $bwzt['target_ids'])) {
@@ -202,8 +202,8 @@ if($id) {
 	realname_get();
 
 	$_TPL['css'] = 'bwzt';
-	include_once template("space_bwzt_view");
-
+	//include_once template("space_bwzt_view");
+	capi_showmessage_by_data("space_bwzt_view",0, array('bwzt'=>$bwzt));
 } else {
 	//分页
 	$perpage = 10;
@@ -308,7 +308,7 @@ if($id) {
 				$wheresql = "b.uid='$space[uid]'";
 				$theurl = "space.php?uid=$space[uid]&do=$do&view=me";
 				$actives = array('me'=>' class="active"');
-				//日志分类
+				//症状分类
 				$query = $_SGLOBAL['db']->query("SELECT bwztclassid, bwztclassname FROM ".tname('bwztclass')." WHERE uid='$space[uid]'");
 				while ($value = $_SGLOBAL['db']->fetch_array($query)) {
 					$bwztclassarr[$value['bwztclassid']] = $value['bwztclassname'];
@@ -412,7 +412,9 @@ if($id) {
 	realname_get();
 
 	$_TPL['css'] = 'bwzt';
-	include_once template("space_bwzt_list");
+	//include_once template("space_bwzt_list");
+
+	capi_showmessage_by_data("space_bwzt_list", 0,array('list'=>$list, 'count'=>count($count)));
 }
 
 ?>

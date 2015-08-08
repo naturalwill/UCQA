@@ -24,7 +24,7 @@ if($bwztid) {
 if(empty($bwzt)) {
 	if(!checkperm('allowbwzt')) {
 		ckspacelog();
-		showmessage('no_authority_to_add_log');
+		capi_showmessage_by_data('no_authority_to_add_log');
 	}
 	
 	//实名认证
@@ -39,7 +39,7 @@ if(empty($bwzt)) {
 	//判断是否发布太快
 	$waittime = interval_check('post');
 	if($waittime > 0) {
-		showmessage('operating_too_fast','',1,array($waittime));
+		capi_showmessage_by_data('operating_too_fast',1,array("waittime"=>$waittime));
 	}
 	
 	//接收外部标题
@@ -49,25 +49,25 @@ if(empty($bwzt)) {
 } else {
 	
 	if($_SGLOBAL['supe_uid'] != $bwzt['uid'] && !checkperm('managebwzt')) {
-		showmessage('no_authority_operation_of_the_log');
+		capi_showmessage_by_data('no_authority_operation_of_the_log');
 	}
 }
 
 //添加编辑操作
-if(submitcheck('bwztsubmit')) {
+if(capi_submitcheck('bwztsubmit')) {
 
 	if(empty($bwzt['bwztid'])) {
 		$bwzt = array();
 	} else {
 		if(!checkperm('allowbwzt')) {
 			ckspacelog();
-			showmessage('no_authority_to_add_log');
+			capi_showmessage_by_data('no_authority_to_add_log');
 		}
 	}
 	
 	//验证码
 	if(checkperm('seccode') && !ckseccode($_POST['seccode'])) {
-		showmessage('incorrect_code');
+		capi_showmessage_by_data('incorrect_code');
 	}
 	
 	include_once(S_ROOT.'./source/function_bwzt.php');
@@ -77,20 +77,20 @@ if(submitcheck('bwztsubmit')) {
 		} else {
 			$url = 'space.php?uid='.$newbwzt['uid'].'&do=bwzt&id='.$newbwzt['bwztid'];
 		}
-		showmessage('do_success', $url, 0);
+		capi_showmessage_by_data('do_success', 0);
 	} else {
-		showmessage('that_should_at_least_write_things');
+		capi_showmessage_by_data('that_should_at_least_write_things');
 	}
 }
 
 if($_GET['op'] == 'delete') {
 	//删除
-	if(submitcheck('deletesubmit')) {
+	if(capi_submitcheck('deletesubmit')) {
 		include_once(S_ROOT.'./source/function_delete.php');
 		if(deletebwzts(array($bwztid))) {
-			showmessage('do_success', "space.php?uid=$bwzt[uid]&do=bwzt&view=me");
+			capi_showmessage_by_data('do_success', 0, "space.php?uid=$bwzt[uid]&do=bwzt&view=me");
 		} else {
-			showmessage('failed_to_delete_operation');
+			capi_showmessage_by_data('failed_to_delete_operation');
 		}
 	}
 	
@@ -99,15 +99,15 @@ if($_GET['op'] == 'delete') {
 	$id = intval($_GET['id']);
 	$uid = $id?getcount('bwzt', array('bwztid'=>$id), 'uid'):0;
 
-	showmessage('do_success', "space.php?uid=$uid&do=bwzt&id=$id", 0);
+	capi_showmessage_by_data('do_success', 0, "space.php?uid=$uid&do=bwzt&id=$id");
 	
 } elseif($_GET['op'] == 'edithot') {
 	//权限
 	if(!checkperm('managebwzt')) {
-		showmessage('no_privilege');
+		capi_showmessage_by_data('no_privilege');
 	}
 	
-	if(submitcheck('hotsubmit')) {
+	if(capi_submitcheck('hotsubmit')) {
 		$_POST['hot'] = intval($_POST['hot']);
 		updatetable('bwzt', array('hot'=>$_POST['hot']), array('bwztid'=>$bwzt['bwztid']));
 		if($_POST['hot']>0) {
@@ -117,7 +117,7 @@ if($_GET['op'] == 'delete') {
 			updatetable('feed', array('hot'=>$_POST['hot']), array('id'=>$bwzt['bwztid'], 'idtype'=>'bwztid'));
 		}
 		
-		showmessage('do_success', "space.php?uid=$bwzt[uid]&do=bwzt&id=$bwzt[bwztid]", 0);
+		capi_showmessage_by_data('do_success', 0, "space.php?uid=$bwzt[uid]&do=bwzt&id=$bwzt[bwztid]");
 	}
 	
 } else {
@@ -174,6 +174,6 @@ if($_GET['op'] == 'delete') {
 	$menuactives = array('space'=>' class="active"');
 }
 
-include_once template("cp_bwzt");
+//include_once template("cp_bwzt");
 
 ?>
