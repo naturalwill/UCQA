@@ -5,7 +5,9 @@
 */
 
 @define('IN_UCHOME', TRUE);
-define('D_BUG', '0');
+define('D_BUG', '1');
+//是否每次都自动更新模板缓存
+define('Flash_Template', '1');
 
 D_BUG?error_reporting(7):error_reporting(0);
 set_magic_quotes_runtime(0);

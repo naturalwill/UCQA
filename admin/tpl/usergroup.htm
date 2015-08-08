@@ -245,6 +245,13 @@
 		</td>
 	</tr>
 	<tr>
+		<th>发表咨询</th>
+		<td>
+			<input type="radio" name="set[allowbwzt]" value="1"<!--{if $thevalue['allowbwzt']==1}--> checked<!--{/if}-->> 是
+			<input type="radio" name="set[allowbwzt]" value="0"<!--{if $thevalue['allowbwzt']!=1}--> checked<!--{/if}-->> 否
+		</td>
+	</tr>
+	<tr>
 		<th>上传图片</th>
 		<td>
 			<input type="radio" name="set[allowupload]" value="1"<!--{if $thevalue['allowupload']==1}--> checked<!--{/if}-->> 是
@@ -535,6 +542,13 @@
 		<td>
 			<input type="radio" name="set[manageblog]" value="1"<!--{if $thevalue['manageblog']==1}--> checked<!--{/if}-->> 可管理
 			<input type="radio" name="set[manageblog]" value="0"<!--{if $thevalue['manageblog']!=1}--> checked<!--{/if}-->> 禁止
+		</td>
+	</tr>
+	<tr>
+		<th>咨询</th>
+		<td>
+			<input type="radio" name="set[managebwzt]" value="1"<!--{if $thevalue['managebwzt']==1}--> checked<!--{/if}-->> 可管理
+			<input type="radio" name="set[managebwzt]" value="0"<!--{if $thevalue['managebwzt']!=1}--> checked<!--{/if}-->> 禁止
 		</td>
 	</tr>
 	<tr>

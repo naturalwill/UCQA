@@ -70,6 +70,14 @@
 			</td>
 		</tr>
 		<tr>
+			<th>咨询</th>
+			<td><select name="privacy[view][bwzt]">
+				<option value="0"$sels[view][bwzt][0]>全站用户可见</option>
+				<option value="1"$sels[view][bwzt][1]>仅好友可见</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
 			<th>&nbsp;</th>
 			<td class="gray">本隐私设置仅在其他用户查看您主页时有效；
 				<br>相关浏览权限需要在每篇日志中单独设置方可完全生效。
@@ -202,6 +210,10 @@
 		</tr>
 		<tr>
 			<th>&nbsp;</th>
+			<td><input type="checkbox" name="privacy[feed][bwzt]" value="1"$sels[feed][bwzt]>撰写咨询</td>
+		</tr>
+		<tr>
+			<th>&nbsp;</th>
 			<td><input type="checkbox" name="privacy[feed][upload]" value="1"$sels[feed][upload]>上传图片</td>
 		</tr>
 		<tr>
@@ -314,6 +326,9 @@
 			$iconnames['poll'] = '投票';
 			$iconnames['pollcomment'] = '投票评论';
 			$iconnames['pollinvite'] = '投票邀请';
+			$iconnames['bwzt'] = '咨询';
+			$iconnames['bwztcomment'] = '咨询评论';
+			$iconnames['clickbwzt'] = '咨询表态';
 		}-->
 
 	<table cellspacing="0" cellpadding="0" class="formtable">

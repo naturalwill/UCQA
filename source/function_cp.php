@@ -93,10 +93,12 @@ function pic_save($FILE, $albumid, $title, $topicid=0) {
 		$albumid = 0;
 		$showtip = false;
 	}
-
+	
 	//本地上传
-	$new_name = $_SC['attachdir'].'./'.$filepath;
+	$new_name = S_ROOT."./".$_SC['attachdir'].'./'.$filepath;
+	$new_name_yun = $_SC['attachurl'].'./'.$filepath;
 	$tmp_name = $FILE['tmp_name'];
+	
 	if(@copy($tmp_name, $new_name)) {
 		@unlink($tmp_name);
 	} elseif((function_exists('move_uploaded_file') && @move_uploaded_file($tmp_name, $new_name))) {
@@ -500,6 +502,10 @@ function hot_update($idtype, $id, $hotuser) {
 	}
 
 	switch ($idtype) {
+		case 'bwztid':
+			$_SGLOBAL['db']->query("UPDATE ".tname('bwztfield')." SET hotuser='$hotuser' WHERE bwztid='$id'");
+			$_SGLOBAL['db']->query("UPDATE ".tname('bwzt')." SET hot=hot+1 WHERE bwztid='$id'");
+			break;
 		case 'blogid':
 			$_SGLOBAL['db']->query("UPDATE ".tname('blogfield')." SET hotuser='$hotuser' WHERE blogid='$id'");
 			$_SGLOBAL['db']->query("UPDATE ".tname('blog')." SET hot=hot+1 WHERE blogid='$id'");
@@ -546,6 +552,8 @@ function gettablebyidtype($idtype) {
 	$tablename = '';
 	if($idtype == 'blogid') {
 		$tablename = 'blog';
+	} elseif($idtype == 'bwztid') {
+		$tablename = 'bwzt';
 	} elseif($idtype == 'tid') {
 		$tablename = 'thread';
 	} elseif($idtype == 'picid') {
@@ -559,6 +567,78 @@ function gettablebyidtype($idtype) {
 	}
 	return $tablename;
 }
+
+//管理员发布通知
+function admin_notification_add($uid, $type, $note, $returnid=0) {
+	global $_SGLOBAL;
+
+	//获取对方的筛选条件
+	$tospace = getspace($uid);
+	$authorspace = getspace(1);
+	
+	realname_set($authorspace['uid'], $authorspace['username']);
+
+	realname_get();
+	
+	//更新我的好友关系热度
+	if($_SGLOBAL['supe_uid']) {
+		addfriendnum($tospace['uid'], $tospace['username']);
+	}
+	
+	$setarr = array(
+		'uid' => $uid,
+		'type' => $type,
+		'new' => 1,
+		'authorid' => 1,
+		'author' => $_SN[1],
+		'note' => addslashes(sstripslashes($note)),
+		'dateline' => $_SGLOBAL['timestamp']
+	);
+
+	$filter = empty($tospace['privacy']['filter_note'])?array():array_keys($tospace['privacy']['filter_note']);
+	if(cknote_uid($setarr, $filter)) {
+		//更新用户通知
+		$_SGLOBAL['db']->query("UPDATE ".tname('space')." SET notenum=notenum+1 WHERE uid='$uid'");
+	
+		if($returnid) {
+			return inserttable('notification', $setarr, $returnid);
+		} else {
+			inserttable('notification', $setarr);
+		}
+	}
+	
+}
+
+function notification_add_push($uid, $note, $authorid=0, $setarr=""){
+	global $_SGLOBAL;
+
+    include_once(S_ROOT.'./capi/function_capi.php');
+	
+	//获取对方的筛选条件
+	$tospace = getspace($uid);
+
+	if (!empty($tospace["iostoken"])){
+		if ($authorid){
+			$realname = capi_realname($authorid);
+			apple_push($tospace["iostoken"],  $realname.":".strip_tags($note),$setarr);
+			
+		}else{
+			apple_push($tospace["iostoken"],  strip_tags($note),$setarr);
+			
+		}
+	}
+	
+	if ($tospace["isandriod"]){
+		if ($authorid){
+			$realname = capi_realname($authorid);
+			andriod_push($uid, $realname.":".strip_tags($note),$setarr);
+		}else{
+			andriod_push($uid, strip_tags($note),$setarr);
+		}
+	}
+}
+
+
 
 //通知
 function notification_add($uid, $type, $note, $returnid=0) {
@@ -1111,6 +1191,28 @@ function ckavatar($uid) {
 		return file_exists($file)?1:0;
 	}
 }
+//------------------------------
+//获取病症分类
+function getbwztclassarr($uid) {
+	global $_SGLOBAL;
 
+	$bwztclassarr = array();
+	$query = $_SGLOBAL['db']->query("SELECT bwztclassid, bwztclassname FROM ".tname('bwztclass')." WHERE uid='$uid'");
+	while ($value = $_SGLOBAL['db']->fetch_array($query)) {
+		$bwztclassarr[$value['bwztclassid']] = $value;
+	}
+	return $bwztclassarr;
+}
+//获取科室分类
+function getbwztdivisionarr($uid) {
+	global $_SGLOBAL;
+
+	$bwztdivisionarr = array();
+	$query = $_SGLOBAL['db']->query("SELECT bwztdivisionid, bwztdivisionname FROM ".tname('bwztdivision')." WHERE uid='$uid'");
+	while ($value = $_SGLOBAL['db']->fetch_array($query)) {
+		$bwztdivisionarr[$value['bwztdivisionid']] = $value;
+	}
+	return $bwztdivisionarr;
+}
 
 ?>

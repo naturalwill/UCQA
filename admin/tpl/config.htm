@@ -530,6 +530,12 @@
 			<input type="radio" name="config[name_allowblog]" value="0"<!--{if $configs[name_allowblog] != '1'}--> checked<!--{/if}-->>否
 			</td></tr>
 			<tr>
+			<td width="150">允许发咨询</td>
+			<td>
+			<input type="radio" name="config[name_allowbwzt]" value="1"<!--{if $configs[name_allowbwzt] == 1}--> checked<!--{/if}-->>是
+			<input type="radio" name="config[name_allowbwzt]" value="0"<!--{if $configs[name_allowbwzt] != '1'}--> checked<!--{/if}-->>否
+			</td></tr>
+			<tr>
 			<td width="150">允许使用相册</td>
 			<td>
 			<input type="radio" name="config[name_allowalbum]" value="1"<!--{if $configs[name_allowalbum] == 1}--> checked<!--{/if}-->>是
@@ -650,6 +656,12 @@
 			<td>
 			<input type="radio" name="config[video_allowblog]" value="1"<!--{if $configs[video_allowblog] == 1}--> checked<!--{/if}-->>是
 			<input type="radio" name="config[video_allowblog]" value="0"<!--{if $configs[video_allowblog] != '1'}--> checked<!--{/if}-->>否
+			</td></tr>
+			<tr>
+			<td width="150">允许发咨询</td>
+			<td>
+			<input type="radio" name="config[video_allowbwzt]" value="1"<!--{if $configs[video_allowbwzt] == 1}--> checked<!--{/if}-->>是
+			<input type="radio" name="config[video_allowbwzt]" value="0"<!--{if $configs[video_allowbwzt] != '1'}--> checked<!--{/if}-->>否
 			</td></tr>
 			<tr>
 			<td width="150">允许使用相册</td>

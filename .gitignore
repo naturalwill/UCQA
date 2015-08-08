@@ -1,0 +1,10 @@
+/config.php
+/data/*.lock
+/data/*.php
+/data/*/*.php
+/uc_client/data/cache/*.php
+/ucenter/data/*.lock
+/ucenter/data/*.php
+/ucenter/data/*/*.php
+/attachment/*
+!/attachment/index.htm

@@ -98,6 +98,15 @@
 			</td>
 		</tr>
 		<tr>
+			<th>咨询</th>
+			<td><select name="privacy[view][bwzt]">
+				<option value="0"$sels[view][bwzt][0]>全站用户可见</option>
+				<option value="1"$sels[view][bwzt][1]>仅好友可见</option>
+				</select><br/>
+				相关浏览权限需要在每篇咨询中单独设置方可完全生效。
+			</td>
+		</tr>
+		<tr>
 			<th>相册</th>
 			<td><select name="privacy[view][album]">
 				<option value="0"$sels[view][album][0]>全站用户可见</option>
@@ -139,6 +148,10 @@
 		<tr>
 			<th>&nbsp;</th>
 			<td><input type="checkbox" name="privacy[feed][blog]" value="1"$sels[feed][blog]>撰写日志</td>
+		</tr>
+		<tr>
+			<th>&nbsp;</th>
+			<td><input type="checkbox" name="privacy[feed][bwzt]" value="1"$sels[feed][bwzt]>撰写咨询</td>
 		</tr>
 		<tr>
 			<th>&nbsp;</th>

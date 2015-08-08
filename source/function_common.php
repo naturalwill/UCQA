@@ -883,7 +883,16 @@ function template($name) {
 			$tpl = "template/$_SCONFIG[template]/$name";
 		}
 		$objfile = S_ROOT.'./data/tpl_cache/'.str_replace('/','_',$tpl).'.php';
-		if(!file_exists($objfile)) {
+		// if(!file_exists($objfile)) {
+			// include_once(S_ROOT.'./source/function_template.php');
+			// parse_template($tpl);
+		// }
+		//新添加,可控制是否自动刷新模板
+		if(Flash_Template==1){
+			include_once(S_ROOT.'./source/function_template.php');
+			parse_template($tpl);
+		}
+		elseif(!file_exists($objfile)) {
 			include_once(S_ROOT.'./source/function_template.php');
 			parse_template($tpl);
 		}
@@ -1500,7 +1509,7 @@ function mkfeed($feed, $actors=array()) {
 	}
 
 	//管理
-	if(in_array($feed['idtype'], array('blogid','picid','sid','pid','eventid'))) {
+	if(in_array($feed['idtype'], array('blogid','picid','sid','pid','eventid','bwztid'))) {
 		$feed['showmanage'] = 1;
 	}
 	
@@ -2108,7 +2117,7 @@ function topic_get($topicid) {
 	global $_SGLOBAL;
 	$topic = array();
 	if($topicid) {
-		$typearr = array('blog','pic','thread','poll','event','share');
+		$typearr = array('blog','pic','thread','poll','event','share','bwzt');
 		$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('topic')." WHERE topicid='$topicid'");
 		if($topic = $_SGLOBAL['db']->fetch_array($query)) {
 			$topic['pic'] = $topic['pic']?pic_get($topic['pic'], $topic['thumb'], $topic['remote'], 0):'';
