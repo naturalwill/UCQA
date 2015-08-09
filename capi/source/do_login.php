@@ -14,9 +14,10 @@ if($_SGLOBAL['supe_uid']) {
 	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('session')." WHERE username='$_REQUEST[username]' ");
 	if($member = $_SGLOBAL['db']->fetch_array($query)) {
 		$auth = authcode("$member[password]\t$member[uid]", 'ENCODE');
+		$space = getspace($_SGLOBAL['supe_uid']);
+		capi_showmessage_by_data('do_success', 0, array("space"=>$space, "m_auth"=>rawurlencode($auth)));
 	}
-	$space = getspace($_SGLOBAL['supe_uid']);
-	capi_showmessage_by_data('do_success', 0, array("space"=>$space, "m_auth"=>rawurlencode($auth)));
+	capi_showmessage_by_data('login_failure_please_re_login');
 }
 
 $refer = empty($_REQUEST['refer'])?rawurldecode($_SCOOKIE['_refer']):$_REQUEST['refer'];
