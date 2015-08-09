@@ -87,7 +87,7 @@ if($_GET['op'] == 'delete') {
 	if(capi_submitcheck('deletesubmit')) {
 		include_once(S_ROOT.'./source/function_delete.php');
 		if(deletebwzts(array($bwztid))) {
-			capi_showmessage_by_data('do_success', 0, "space.php?uid=$bwzt[uid]&do=bwzt&view=me");
+			capi_showmessage_by_data('do_success', 0, array("url"=>"space.php?uid=$bwzt[uid]&do=bwzt&view=me"));
 		} else {
 			capi_showmessage_by_data('failed_to_delete_operation');
 		}
@@ -98,7 +98,7 @@ if($_GET['op'] == 'delete') {
 	$id = intval($_GET['id']);
 	$uid = $id?getcount('bwzt', array('bwztid'=>$id), 'uid'):0;
 
-	capi_showmessage_by_data('do_success', 0, "space.php?uid=$uid&do=bwzt&id=$id");
+	capi_showmessage_by_data('do_success', 0, array("url"=> "space.php?uid=$uid&do=bwzt&id=$id"));
 	
 } elseif($_GET['op'] == 'edithot') {
 	//х╗оч
@@ -116,7 +116,7 @@ if($_GET['op'] == 'delete') {
 			updatetable('feed', array('hot'=>$_POST['hot']), array('id'=>$bwzt['bwztid'], 'idtype'=>'bwztid'));
 		}
 		
-		capi_showmessage_by_data('do_success', 0, "space.php?uid=$bwzt[uid]&do=bwzt&id=$bwzt[bwztid]");
+		capi_showmessage_by_data('do_success', 0,  array("url"=>"space.php?uid=$bwzt[uid]&do=bwzt&id=$bwzt[bwztid]"));
 	}
 	
 } else {
@@ -174,5 +174,5 @@ if($_GET['op'] == 'delete') {
 }
 
 //include_once template("cp_bwzt");
-
+capi_showmessage_by_data('do_success', 0, array("bwzt"=>$bwzt));
 ?>

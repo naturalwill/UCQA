@@ -1,6 +1,7 @@
 /config.php
 /data/*.lock
 /data/*.php
+/data/*.txt
 /data/*/*.php
 /uc_client/data/cache/*.php
 /ucenter/data/*.lock
