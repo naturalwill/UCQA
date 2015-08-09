@@ -106,7 +106,7 @@ if(capi_submitcheck('loginsubmit')) {
 	}
 
 	//清理在线session
-	$setarr = insertsession($setarr); //客户端登陆
+	insertsession($setarr);
 	$auth = authcode("$setarr[password]\t$setarr[uid]", 'ENCODE');
 	//设置cookie
 	ssetcookie('auth', $auth, $cookietime);
@@ -145,13 +145,11 @@ if(capi_submitcheck('loginsubmit')) {
 			}
 			$setarr['avatar'] = 'avatar=1';
 			$setarr['updatetime'] = "updatetime=$_SGLOBAL[timestamp]";
-			$space["reward"] = $reward;
 		}
 	} else {
 		if($space['avatar']) {
 			$setarr['avatar'] = 'avatar=0';
 		}
-		$space["reward"] = getreward('null', 0);
 	}
 	
 	if($setarr) {

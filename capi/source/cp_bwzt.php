@@ -52,7 +52,6 @@ if(empty($bwzt)) {
 		capi_showmessage_by_data('no_authority_operation_of_the_log');
 	}
 }
-
 //Ìí¼Ó±à¼­²Ù×÷
 if(capi_submitcheck('bwztsubmit')) {
 
@@ -77,7 +76,7 @@ if(capi_submitcheck('bwztsubmit')) {
 		} else {
 			$url = 'space.php?uid='.$newbwzt['uid'].'&do=bwzt&id='.$newbwzt['bwztid'];
 		}
-		capi_showmessage_by_data('do_success', 0);
+		capi_showmessage_by_data('do_success', 0, array('url'=> $url));
 	} else {
 		capi_showmessage_by_data('that_should_at_least_write_things');
 	}

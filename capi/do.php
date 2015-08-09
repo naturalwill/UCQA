@@ -25,7 +25,7 @@ $ac = empty($_GET['ac'])?'':$_GET['ac'];
 $acs = array('login', 'register', 'lostpasswd', 'swfupload', 'inputpwd',
 	'ajax', 'seccode', 'sendmail', 'stat', 'emailcheck');
 if(empty($ac) || !in_array($ac, $acs)) {
-	capi_showmessage_by_data('enter_the_space', 0);
+	capi_showmessage_by_data('enter_the_space');
 }
 
 //Á´½Ó

@@ -8,3 +8,4 @@
 /ucenter/data/*/*.php
 /attachment/*
 !/attachment/index.htm
+/capi/test.php
