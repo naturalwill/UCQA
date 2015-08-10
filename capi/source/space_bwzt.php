@@ -203,7 +203,7 @@ if($id) {
 
 	$_TPL['css'] = 'bwzt';
 	//include_once template("space_bwzt_view");
-	capi_showmessage_by_data("do_success",0, array('bwzt'=>$bwzt));
+	capi_showmessage_by_data("do_success",0, array('bwzt'=>$bwzt, "list"=>$list));
 } else {
 	//·ÖÒ³
 	$perpage = 10;

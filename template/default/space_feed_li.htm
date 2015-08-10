@@ -13,7 +13,7 @@
 		<!--{if empty($_TPL[hidden_menu])}-->
 		<!--{if $value['idtype']=='doid'}-->
 		(<a href="javascript:;" onclick="docomment_get('docomment_$value[id]', 1);" id="do_a_op_$value[id]">回复</a>)
-		<!--{elseif in_array($value['idtype'], array('blogid','picid','sid','pid','eventid'))}-->
+		<!--{elseif in_array($value['idtype'], array('blogid','bwztid','picid','sid','pid','eventid'))}-->
 		(<a href="javascript:;" onclick="feedcomment_get($value[feedid]);" id="feedcomment_a_op_$value[feedid]">评论</a>)
 		<!--{/if}-->
 		<!--{/if}-->

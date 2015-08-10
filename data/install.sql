@@ -1302,6 +1302,7 @@ CREATE TABLE uchome_stat (
   poke smallint(6) unsigned NOT NULL default '0',
   click smallint(6) unsigned NOT NULL default '0',
   `bwzt` smallint(6) unsigned NOT NULL DEFAULT '0',
+  bwztcomment smallint(6) unsigned NOT NULL default '0',
   PRIMARY KEY  (daytime)
 ) ENGINE=MyISAM;
 
