@@ -203,7 +203,7 @@ if($id) {
 
 	$_TPL['css'] = 'bwzt';
 	//include_once template("space_bwzt_view");
-	capi_showmessage_by_data("space_bwzt_view",0, array('bwzt'=>$bwzt));
+	capi_showmessage_by_data("do_success",0, array('bwzt'=>$bwzt));
 } else {
 	//·ÖÒ³
 	$perpage = 10;
@@ -414,7 +414,7 @@ if($id) {
 	$_TPL['css'] = 'bwzt';
 	//include_once template("space_bwzt_list");
 
-	capi_showmessage_by_data("space_bwzt_list", 0,array('list'=>$list, 'count'=>count($count)));
+	capi_showmessage_by_data("do_success", 0,array('list'=>$list, 'count'=>$count));
 }
 
 ?>
