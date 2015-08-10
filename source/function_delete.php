@@ -13,7 +13,7 @@ function deletecomments($cids) {
 	global $_SGLOBAL;
 
 	$deductcredit = array();
-	$blognums = $spaces = $newcids = $dels = array();
+	$blognums =$bwztnums = $spaces = $newcids = $dels = array();
 	$allowmanage = checkperm('managecomment');
 	$managebatch = checkperm('managebatch');
 	$delnum = 0;
@@ -35,6 +35,9 @@ function deletecomments($cids) {
 		if($value['idtype'] == 'blogid') {
 			$blognums[$value['id']]++;
 		}
+		if($value['idtype'] == 'bwztid') {
+			$bwztnums[$value['id']]++;
+		}
 		if($allowmanage && $value['authorid'] != $value['supe_uid']) {
 			//扣除积分
 			$_SGLOBAL['db']->query("UPDATE ".tname('space')." SET credit=credit-$reward[credit], experience=experience-$reward[experience] WHERE uid='$value[authorid]'");
@@ -49,6 +52,10 @@ function deletecomments($cids) {
 	foreach ($nums[0] as $num) {
 		$_SGLOBAL['db']->query("UPDATE ".tname('blog')." SET replynum=replynum-$num WHERE blogid IN (".simplode($nums[1][$num]).")");
 	}
+	$nums2 = renum($bwztnums);
+	foreach ($nums2[0] as $num) {
+		$_SGLOBAL['db']->query("UPDATE ".tname('bwzt')." SET replynum=replynum-$num WHERE bwztid IN (".simplode($nums2[1][$num]).")");
+	}
 	
 	return $dels;
 }
@@ -62,7 +69,7 @@ function deletebwzts($bwztids) {
 	$reward = getreward('delbwzt', 0);
 	//获取博客信息
 	$spaces = $bwzts = $newbwztids = array();
-	$allowmanage = checkperm('manageblog');
+	$allowmanage = checkperm('managebwzt');
 	$managebatch = checkperm('managebatch');
 	$delnum = 0;
 	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('bwzt')." WHERE bwztid IN (".simplode($bwztids).")");
@@ -560,6 +567,26 @@ function deletespace($uid, $force=0) {
 	$_SGLOBAL['db']->query("DELETE FROM ".tname('blog')." WHERE uid='$uid'");
 	$_SGLOBAL['db']->query("DELETE FROM ".tname('blogfield')." WHERE uid='$uid'");
 
+	//bwzt
+	$bwztids = array();
+	$query = $_SGLOBAL['db']->query("SELECT bwztid FROM ".tname('bwzt')." WHERE uid='$uid'");
+	while ($value = $_SGLOBAL['db']->fetch_array($query)) {
+		$bwztids[$value['bwztid']] = $value['bwztid'];
+		//tag
+		$tags = array();
+		$subquery = $_SGLOBAL['db']->query("SELECT tagid, bwztid FROM ".tname('tagbwzt')." WHERE bwztid='$value[bwztid]'");
+		while ($tag = $_SGLOBAL['db']->fetch_array($subquery)) {
+			$tags[$tag['tagid']] = $tag['tagid'];
+		}
+		if($tags) {
+			$_SGLOBAL['db']->query("UPDATE ".tname('tag')." SET bwztnum=bwztnum-1 WHERE tagid IN (".simplode($tags).")");
+			$_SGLOBAL['db']->query("DELETE FROM ".tname('tagbwzt')." WHERE bwztid='$value[bwztid]'");
+		}
+	}
+	//数据删除
+	$_SGLOBAL['db']->query("DELETE FROM ".tname('bwzt')." WHERE uid='$uid'");
+	$_SGLOBAL['db']->query("DELETE FROM ".tname('bwztfield')." WHERE uid='$uid'");
+
 	//评论
 	$_SGLOBAL['db']->query("DELETE FROM ".tname('comment')." WHERE (uid='$uid' OR authorid='$uid' OR (id='$uid' AND idtype='uid'))");
 
@@ -828,6 +855,7 @@ function deletetags($tagids) {
 
 	//数据
 	$_SGLOBAL['db']->query("DELETE FROM ".tname('tagblog')." WHERE tagid IN (".simplode($tagids).")");
+	$_SGLOBAL['db']->query("DELETE FROM ".tname('tagbwzt')." WHERE tagid IN (".simplode($tagids).")");
 	$_SGLOBAL['db']->query("DELETE FROM ".tname('tag')." WHERE tagid IN (".simplode($tagids).")");
 
 	return true;

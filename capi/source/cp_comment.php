@@ -13,13 +13,13 @@ include_once(S_ROOT.'./source/function_bbcode.php');
 //共用变量
 $tospace = $pic = $blog  = $bwzt = $album = $share = $event = $poll = array();
 
-if(submitcheck('commentsubmit')) {
+if(capi_submitcheck('commentsubmit')) {
 
 	$idtype = $_POST['idtype'];
 	
 	if(!checkperm('allowcomment')) {
 		ckspacelog();
-		showmessage('no_privilege');
+		capi_showmessage_by_data('no_privilege');
 	}
 
 	//实名认证
@@ -31,12 +31,12 @@ if(submitcheck('commentsubmit')) {
 	//判断是否发布太快
 	$waittime = interval_check('post');
 	if($waittime > 0) {
-		showmessage('operating_too_fast','',1,array($waittime));
+		capi_showmessage_by_data('operating_too_fast',1,array("waittime"=>$waittime));
 	}
 
 	$message = getstr($_POST['message'], 0, 1, 1, 1, 2);
 	if(strlen($message) < 2) {
-		showmessage('content_is_too_short');
+		capi_showmessage_by_data('content_is_too_short');
 	}
 
 	//摘要
@@ -90,7 +90,7 @@ if(submitcheck('commentsubmit')) {
 			$pic = $_SGLOBAL['db']->fetch_array($query);
 			//图片不存在
 			if(empty($pic)) {
-				showmessage('view_images_do_not_exist');
+				capi_showmessage_by_data('view_images_do_not_exist');
 			}
 
 			//检索空间
@@ -106,13 +106,13 @@ if(submitcheck('commentsubmit')) {
 			}
 			//验证隐私
 			if(!ckfriend($album['uid'], $album['friend'], $album['target_ids'])) {
-				showmessage('no_privilege');
+				capi_showmessage_by_data('no_privilege');
 			} elseif(!$tospace['self'] && $album['friend'] == 4) {
 				//密码输入问题
 				$cookiename = "view_pwd_album_$album[albumid]";
 				$cookievalue = empty($_SCOOKIE[$cookiename])?'':$_SCOOKIE[$cookiename];
 				if($cookievalue != md5(md5($album['password']))) {
-					showmessage('no_privilege');
+					capi_showmessage_by_data('no_privilege');
 				}
 			}
 			
@@ -128,7 +128,7 @@ if(submitcheck('commentsubmit')) {
 			$blog = $_SGLOBAL['db']->fetch_array($query);
 			//日志不存在
 			if(empty($blog)) {
-				showmessage('view_to_info_did_not_exist');
+				capi_showmessage_by_data('view_to_info_did_not_exist');
 			}
 			
 			//检索空间
@@ -137,19 +137,19 @@ if(submitcheck('commentsubmit')) {
 			//验证隐私
 			if(!ckfriend($blog['uid'], $blog['friend'], $blog['target_ids'])) {
 				//没有权限
-				showmessage('no_privilege');
+				capi_showmessage_by_data('no_privilege');
 			} elseif(!$tospace['self'] && $blog['friend'] == 4) {
 				//密码输入问题
 				$cookiename = "view_pwd_blog_$blog[blogid]";
 				$cookievalue = empty($_SCOOKIE[$cookiename])?'':$_SCOOKIE[$cookiename];
 				if($cookievalue != md5(md5($blog['password']))) {
-					showmessage('no_privilege');
+					capi_showmessage_by_data('no_privilege');
 				}
 			}
 
 			//是否允许评论
 			if(!empty($blog['noreply'])) {
-				showmessage('do_not_accept_comments');
+				capi_showmessage_by_data('do_not_accept_comments');
 			}
 			if($blog['target_ids']) {
 				$blog['target_ids'] .= ",$blog[uid]";
@@ -167,7 +167,7 @@ if(submitcheck('commentsubmit')) {
 			$bwzt = $_SGLOBAL['db']->fetch_array($query);
 			//咨询不存在
 			if(empty($bwzt)) {
-				showmessage('view_to_info_did_not_exist');
+				capi_showmessage_by_data('view_to_info_did_not_exist');
 			}
 			
 			//检索空间
@@ -176,19 +176,19 @@ if(submitcheck('commentsubmit')) {
 			//验证隐私
 			if(!ckfriend($bwzt['uid'], $bwzt['friend'], $bwzt['target_ids'])) {
 				//没有权限
-				showmessage('no_privilege');
+				capi_showmessage_by_data('no_privilege');
 			} elseif(!$tospace['self'] && $bwzt['friend'] == 4) {
 				//密码输入问题
 				$cookiename = "view_pwd_bwzt_$bwzt[bwztid]";
 				$cookievalue = empty($_SCOOKIE[$cookiename])?'':$_SCOOKIE[$cookiename];
 				if($cookievalue != md5(md5($bwzt['password']))) {
-					showmessage('no_privilege');
+					capi_showmessage_by_data('no_privilege');
 				}
 			}
 
 			//是否允许评论
 			if(!empty($bwzt['noreply'])) {
-				showmessage('do_not_accept_comments');
+				capi_showmessage_by_data('do_not_accept_comments');
 			}
 			if($bwzt['target_ids']) {
 				$bwzt['target_ids'] .= ",$bwzt[uid]";
@@ -203,7 +203,7 @@ if(submitcheck('commentsubmit')) {
 			$share = $_SGLOBAL['db']->fetch_array($query);
 			//日志不存在
 			if(empty($share)) {
-				showmessage('sharing_does_not_exist');
+				capi_showmessage_by_data('sharing_does_not_exist');
 			}
 
 			//检索空间
@@ -219,14 +219,14 @@ if(submitcheck('commentsubmit')) {
 				WHERE p.pid='$id'");
 			$poll = $_SGLOBAL['db']->fetch_array($query);
 			if(empty($poll)) {
-				showmessage('voting_does_not_exist');
+				capi_showmessage_by_data('voting_does_not_exist');
 			}
 			//是否允许评论
 			$tospace = getspace($poll['uid']);
 			if($poll['noreply']) {
 				//是否好友
 				if(!$tospace['self'] && !in_array($_SGLOBAL['supe_uid'], $tospace['friends'])) {
-					showmessage('the_vote_only_allows_friends_to_comment');
+					capi_showmessage_by_data('the_vote_only_allows_friends_to_comment');
 				}
 			}
 			
@@ -239,20 +239,20 @@ if(submitcheck('commentsubmit')) {
 			$event = $_SGLOBAL['db']->fetch_array($query);
 
 			if(empty($event)) {
-				showmessage('event_does_not_exist');
+				capi_showmessage_by_data('event_does_not_exist');
 			}
 			
 			if($event['grade'] < -1){
-				showmessage('event_is_closed');//活动已经关闭
+				capi_showmessage_by_data('event_is_closed');//活动已经关闭
 			} elseif($event['grade'] <= 0){
-				showmessage('event_under_verify');//活动未通过审核
+				capi_showmessage_by_data('event_under_verify');//活动未通过审核
 			}
 			
 			if(!$event['allowpost']){
 				$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname("userevent")." WHERE eventid='$id' AND uid='$_SGLOBAL[supe_uid]' LIMIT 1");
 				$value = $_SGLOBAL['db']->fetch_array($query);
 				if(empty($value) || $value['status'] < 2){
-					showmessage('event_only_allows_members_to_comment');//只有活动成员允许发表留言
+					capi_showmessage_by_data('event_only_allows_members_to_comment');//只有活动成员允许发表留言
 				}
 			}
 
@@ -263,12 +263,12 @@ if(submitcheck('commentsubmit')) {
 			$stattype = 'eventcomment';//统计
 			break;
 		default:
-			showmessage('non_normal_operation');
+			capi_showmessage_by_data('non_normal_operation');
 			break;
 	}
 	
 	if(empty($tospace)) {
-		showmessage('space_does_not_exist');
+		capi_showmessage_by_data('space_does_not_exist');
 	}
 	
 	//视频认证
@@ -282,7 +282,7 @@ if(submitcheck('commentsubmit')) {
 	
 	//黑名单
 	if(isblacklist($tospace['uid'])) {
-		showmessage('is_blacklist');
+		capi_showmessage_by_data('is_blacklist');
 	}
 	
 	//热点
@@ -526,7 +526,7 @@ if(submitcheck('commentsubmit')) {
 		}
 	}
 
-	showmessage($msg, $_POST['refer'], 0, $magvalues);
+	capi_showmessage_by_data($msg ,0,array("refer"=> $_POST['refer'],"magvalues"=> $magvalues));
 }
 
 $cid = empty($_GET['cid'])?0:intval($_GET['cid']);
@@ -536,31 +536,32 @@ if($_GET['op'] == 'edit') {
 
 	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('comment')." WHERE cid='$cid' AND authorid='$_SGLOBAL[supe_uid]'");
 	if(!$comment = $_SGLOBAL['db']->fetch_array($query)) {
-		showmessage('no_privilege');
+		capi_showmessage_by_data('no_privilege');
 	}
 
 	//提交编辑
-	if(submitcheck('editsubmit')) {
+	if(capi_submitcheck('editsubmit')) {
 
 		$message = getstr($_POST['message'], 0, 1, 1, 1, 2);
-		if(strlen($message) < 2) showmessage('content_is_too_short');
+		if(strlen($message) < 2) capi_showmessage_by_data('content_is_too_short');
 
 		updatetable('comment', array('message'=>$message), array('cid'=>$comment['cid']));
 
-		showmessage('do_success', $_POST['refer'], 0);
+		capi_showmessage_by_data('do_success',0 ,array("refer"=>$_POST['refer'] ));
 	}
 
 	//bbcode转换
 	$comment['message'] = html2bbcode($comment['message']);//显示用
+	capi_showmessage_by_data('do_success',0 ,array("comment"=>$comment));
 
 } elseif($_GET['op'] == 'delete') {
 
-	if(submitcheck('deletesubmit')) {
+	if(capi_submitcheck('deletesubmit')) {
 		include_once(S_ROOT.'./source/function_delete.php');
 		if(deletecomments(array($cid))) {
-			showmessage('do_success', $_POST['refer'], 0);
+			capi_showmessage_by_data('do_success', 0,array("refer"=>$_POST['refer'] ));
 		} else {
-			showmessage('no_privilege');
+			capi_showmessage_by_data('no_privilege');
 		}
 	}
 
@@ -568,12 +569,12 @@ if($_GET['op'] == 'edit') {
 
 	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('comment')." WHERE cid='$cid'");
 	if(!$comment = $_SGLOBAL['db']->fetch_array($query)) {
-		showmessage('comments_do_not_exist');
+		capi_showmessage_by_data('comments_do_not_exist');
 	}
 
 } else {
 
-	showmessage('no_privilege');
+	capi_showmessage_by_data('no_privilege');
 }
 
 include template('cp_comment');
