@@ -577,6 +577,6 @@ if($_GET['op'] == 'edit') {
 	capi_showmessage_by_data('no_privilege');
 }
 
-include template('cp_comment');
-
+//include template('cp_comment');
+capi_showmessage_by_data("do_success",0,array("comment"=>$comment));//
 ?>

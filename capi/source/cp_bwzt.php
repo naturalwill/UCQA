@@ -174,5 +174,9 @@ if($_GET['op'] == 'delete') {
 }
 
 //include_once template("cp_bwzt");
+
+$bwzt['formhash']=formhash();
+$bwzt['bwztclassarr']=$bwztclassarr;
+$bwzt['bwztdivisionarr']=$bwztdivisionarr;
 capi_showmessage_by_data('do_success', 0, array("bwzt"=>$bwzt));
 ?>

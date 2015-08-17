@@ -203,7 +203,10 @@ if($id) {
 
 	$_TPL['css'] = 'bwzt';
 	//include_once template("space_bwzt_view");
-	capi_showmessage_by_data("do_success",0, array('bwzt'=>$bwzt, "list"=>$list));
+	$commenttip=array("commentsubmit"=>true,"formhash"=>formhash(),"id"=>$bwzt[bwztid],"idtype"=>"bwztid","message"=>"","refer"=>"");
+	$bwzt["replylist"]=$list;
+	$bwzt["comment"]=$commenttip;
+	capi_showmessage_by_data("do_success",0, array('bwzt'=>$bwzt));
 } else {
 	//·ÖÒ³
 	$perpage = 10;
