@@ -8,13 +8,20 @@ if(!defined('IN_UCHOME')) {
 	exit('Access Denied');
 }
 
+//返回头像地址
+$avatar_size=$_GET['avatar_size'];
+$get_avatar=$_GET['get_avatar'];
+if(!empty($get_avatar)&&!empty($avatar_size)){
+	capi_showmessage_by_data('do_success', 0, array('avatar_url'=>avatar($space[uid],$avatar_size,TRUE)));
+}
+
 if(submitcheck('avatarsubmit')) {
 	showmessage('do_success', 'cp.php?ac=avatar', 0);
 }
 
 //头像
 include_once S_ROOT.'./uc_client/client.php';
-$uc_avatarflash = uc_avatar($_SGLOBAL['supe_uid'], (empty($_SCONFIG['avatarreal'])?'virtual':'real'));
+$uc_avatarflash = capi_uc_avatar($_SGLOBAL['supe_uid'], (empty($_SCONFIG['avatarreal'])?'virtual':'real'));
 
 //判断用户是否设置了头像
 $setarr = array();
@@ -47,6 +54,6 @@ if($setarr) {
 	}
 }
 
-include template("cp_avatar");
-
+//include template("cp_avatar");
+capi_showmessage_by_data('do_success', 0, array('uc_avatarflash'=> $uc_avatarflash));
 ?>

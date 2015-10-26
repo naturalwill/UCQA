@@ -981,4 +981,26 @@ function uc_check_version() {
 	return is_array($data) ? $data : $return;
 }
 
+
+/**
+ * 修改头像
+ *
+ * @param	int		$uid	用户ID
+ * @param	string	$type	头像类型 real OR virtual 默认为 virtual
+ * @return	string
+ */
+function capi_uc_avatar($uid, $type = 'virtual') {
+	$uid = intval($uid);
+	$uc_input = uc_api_input("uid=$uid");
+	$uc_avatarflash = UC_API.'/images/camera.swf?inajax=1&appid='.UC_APPID.'&input='.$uc_input.'&agent='.md5($_SERVER['HTTP_USER_AGENT']).'&ucapi='.urlencode(UC_API).'&avatartype='.$type;
+		return array(
+			'UC_API'=> UC_API,
+			'appid'=> UC_APPID,
+			'input'=> $uc_input,
+			'agent'=> md5($_SERVER['HTTP_USER_AGENT']),
+			'ucapi'=> urlencode(UC_API),
+			'avatartype'=> $type
+		);
+}
+
 ?>

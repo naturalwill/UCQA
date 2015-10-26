@@ -6,7 +6,8 @@
 /uc_client/data/cache/*.php
 /ucenter/data/*.lock
 /ucenter/data/*.php
-/ucenter/data/*/*.php
+!/ucenter/data/*/index.htm
+/ucenter/data/*/*
 /attachment/*
 !/attachment/index.htm
 /capi/test.php
