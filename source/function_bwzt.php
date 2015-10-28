@@ -182,30 +182,14 @@ function bwzt_post($POST, $olds=array()) {
 		}
 	}
 	
-	//插入文章
+	//记录图片数组
 	if($uploads) {
-		preg_match_all("/\<img\s.*?\_uchome\_localimg\_([0-9]+).+?src\=\"(.+?)\"/i", $message, $mathes);
-		if(!empty($mathes[1])) {
-			$searchs = $idsearchs = array();
-			$replaces = array();
-			foreach ($mathes[1] as $key => $value) {
-				if(!empty($mathes[2][$key]) && !empty($uploads[$value])) {
-					$searchs[] = $mathes[2][$key];
-					$idsearchs[] = "_uchome_localimg_$value";
-					$replaces[] = pic_get($uploads[$value]['filepath'], $uploads[$value]['thumb'], $uploads[$value]['remote'], 0);
-					unset($uploads[$value]);
-				}
-			}
-			if($searchs) {
-				$message = str_replace($searchs, $replaces, $message);
-				$message = str_replace($idsearchs, 'uchomelocalimg[]', $message);
-			}
-		}
-		//未插入文章
+		$picurls=array();
 		foreach ($uploads as $value) {
 			$picurl = pic_get($value['filepath'], $value['thumb'], $value['remote'], 0);
-			$message .= "<div class=\"uchome-message-pic\"><img src=\"$picurl\"><p>$value[title]</p></div>";
-		}
+			$picurls[]= $picurl;
+		}	
+		$bwztarr['picurls']=json_encode($picurls);
 	}
 	
 	//没有填写任何东西

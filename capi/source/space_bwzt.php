@@ -46,6 +46,9 @@ if($id) {
 
 	//整理
 	$bwzt['tag'] = empty($bwzt['tag'])?array():unserialize($bwzt['tag']);
+	
+	//json解密picurls
+	$bwzt['picurls']=json_decode($bwzt['picurls']);
 
 	//处理视频标签
 	include_once(S_ROOT.'./source/function_bwzt.php');
@@ -401,6 +404,7 @@ if($id) {
 					$value['message'] = getstr($value['message'], $summarylen, 0, 0, 0, 0, -1);
 				}
 				if($value['pic']) $value['pic'] = pic_cover_get($value['pic'], $value['picflag']);
+				$value['picurls']=json_decode($value['picurls']);//json解密picurls
 				$list[] = $value;
 			} else {
 				$pricount++;
