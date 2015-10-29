@@ -184,12 +184,12 @@ function bwzt_post($POST, $olds=array()) {
 	
 	//记录图片数组
 	if($uploads) {
-		$picurls=array();
+		$pics=array();
 		foreach ($uploads as $value) {
 			$picurl = pic_get($value['filepath'], $value['thumb'], $value['remote'], 0);
-			$picurls[]= $picurl;
+			$pics[]=array('picurl' => $picurl, 'title' => $value['title']);
 		}	
-		$bwztarr['picurls']=json_encode($picurls);
+		$bwztarr['pics']=json_encode($pics);
 	}
 	
 	//没有填写任何东西

@@ -50,7 +50,13 @@ if($id) {
 	//处理视频标签
 	include_once(S_ROOT.'./source/function_bwzt.php');
 	$bwzt['message'] = bwzt_bbcode($bwzt['message']);
-
+		
+	$bwzt['pics']=json_decode($bwzt['pics']);
+	//插入图片
+	foreach ($bwzt['pics'] as $value) {
+		$bwzt['message'] .= "<div class=\"uchome-message-pic\"><img src=\"$value->picurl\"><p>$value->title</p></div>";
+	}
+	
 	$otherlist = $newlist = array();
 
 	//有效期
