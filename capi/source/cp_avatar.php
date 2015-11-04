@@ -21,7 +21,7 @@ if(submitcheck('avatarsubmit')) {
 
 //头像
 include_once S_ROOT.'./uc_client/client.php';
-$uc_avatarflash = capi_uc_avatar($_SGLOBAL['supe_uid'], (empty($_SCONFIG['avatarreal'])?'virtual':'real'));
+$uc_avatar = capi_uc_avatar($_SGLOBAL['supe_uid'], (empty($_SCONFIG['avatarreal'])?'virtual':'real'));
 
 //判断用户是否设置了头像
 $setarr = array();
@@ -55,5 +55,5 @@ if($setarr) {
 }
 
 //include template("cp_avatar");
-capi_showmessage_by_data('do_success', 0, array('uc_avatarflash'=> $uc_avatarflash));
+capi_showmessage_by_data('do_success', 0, array('uc_avatar'=> $uc_avatar));
 ?>

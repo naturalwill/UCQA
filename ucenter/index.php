@@ -30,6 +30,7 @@ $_FILES		= daddslashes($_FILES);
 $_REQUEST	= daddslashes($_REQUEST, 1, TRUE);
 
 require UC_ROOT.'./release/release.php';
+require UC_ROOT.'./function_capi.php';
 if(!@include UC_DATADIR.'config.inc.php') {
 	exit('The file <b>data/config.inc.php</b> does not exist, perhaps because of UCenter has not been installed, <a href="install/index.php"><b>Please click here to install it.</b></a>.');
 }
