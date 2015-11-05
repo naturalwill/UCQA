@@ -314,16 +314,6 @@ if($id) {
 				$wheresql = "b.uid='$space[uid]'";
 				$theurl = "space.php?uid=$space[uid]&do=$do&view=me";
 				$actives = array('me'=>' class="active"');
-				//日志分类
-				$query = $_SGLOBAL['db']->query("SELECT bwztclassid, bwztclassname FROM ".tname('bwztclass')." WHERE uid='$space[uid]'");
-				while ($value = $_SGLOBAL['db']->fetch_array($query)) {
-					$bwztclassarr[$value['bwztclassid']] = $value['bwztclassname'];
-				}
-				//科室分类
-				$query = $_SGLOBAL['db']->query("SELECT bwztdivisionid, bwztdivisionname FROM ".tname('bwztdivision')." WHERE uid='$space[uid]'");
-				while ($value = $_SGLOBAL['db']->fetch_array($query)) {
-					$bwztdivisionarr[$value['bwztdivisionid']] = $value['bwztdivisionname'];
-				}
 			} else {
 				$wheresql = "b.uid IN ($space[feedfriend])";
 				$theurl = "space.php?uid=$space[uid]&do=$do&view=we";
@@ -353,6 +343,17 @@ if($id) {
 					$userlist[] = $value;
 				}
 			}
+		}
+			
+		//症状分类
+		$query = $_SGLOBAL['db']->query("SELECT bwztclassid, bwztclassname FROM ".tname('bwztclass'));
+		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
+			$bwztclassarr[$value['bwztclassid']] = $value['bwztclassname'];
+		}
+		//科室分类
+		$query = $_SGLOBAL['db']->query("SELECT bwztdivisionid, bwztdivisionname FROM ".tname('bwztdivision'));
+		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
+			$bwztdivisionarr[$value['bwztdivisionid']] = $value['bwztdivisionname'];
 		}
 
 		//分类
