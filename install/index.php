@@ -72,7 +72,7 @@ if (submitcheck('ucsubmit')) {
 	$ucapi = preg_replace("/\/$/", '', trim($_POST['ucapi']));
 	$ucip = trim($_POST['ucip']);
 
-	if(empty($ucapi) || !preg_match("/^(http:\/\/)/i", $ucapi)) {
+	if(empty($ucapi) || !preg_match("/^(https?:\/\/)/i", $ucapi)) {
 		show_msg('UCenter的URL地址不正确');
 	} else {
 		//检查服务器 dns 解析是否正常, dns 解析不正常则要求用户输入ucenter的ip地址
