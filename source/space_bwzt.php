@@ -51,10 +51,12 @@ if($id) {
 	include_once(S_ROOT.'./source/function_bwzt.php');
 	$bwzt['message'] = bwzt_bbcode($bwzt['message']);
 		
-	$bwzt['pics']=json_decode($bwzt['pics']);
-	//≤Â»ÎÕº∆¨
-	foreach ($bwzt['pics'] as $value) {
-		$bwzt['message'] .= "<div class=\"uchome-message-pic\"><img src=\"$value->picurl\"><p>$value->title</p></div>";
+	if(!empty($bwzt['pics'])){
+		$bwzt['pics']=json_decode($bwzt['pics']);
+		//≤Â»ÎÕº∆¨
+		foreach ($bwzt['pics'] as $value) {
+			$bwzt['message'] .= "<div class=\"uchome-message-pic\"><img src=\"$value->picurl\"><p>$value->title</p></div>";
+		}
 	}
 	
 	$otherlist = $newlist = array();
