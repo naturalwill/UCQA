@@ -19,7 +19,7 @@ if(capi_submitcheck('commentsubmit')) {
 	
 	if(!checkperm('allowcomment')) {
 		ckspacelog();
-		capi_showmessage_by_data('no_privilege');
+		capi_showmessage_by_data('no_privilege',1,array('reason'=>'no allow comment'));
 	}
 
 	//实名认证
@@ -106,13 +106,13 @@ if(capi_submitcheck('commentsubmit')) {
 			}
 			//验证隐私
 			if(!ckfriend($album['uid'], $album['friend'], $album['target_ids'])) {
-				capi_showmessage_by_data('no_privilege');
+				capi_showmessage_by_data('no_privilege',1,array('reason'=>'no pic privilege'));
 			} elseif(!$tospace['self'] && $album['friend'] == 4) {
 				//密码输入问题
 				$cookiename = "view_pwd_album_$album[albumid]";
 				$cookievalue = empty($_SCOOKIE[$cookiename])?'':$_SCOOKIE[$cookiename];
 				if($cookievalue != md5(md5($album['password']))) {
-					capi_showmessage_by_data('no_privilege');
+					capi_showmessage_by_data('no_privilege',1,array('reason'=>'error about cookie'));
 				}
 			}
 			
@@ -137,13 +137,13 @@ if(capi_submitcheck('commentsubmit')) {
 			//验证隐私
 			if(!ckfriend($blog['uid'], $blog['friend'], $blog['target_ids'])) {
 				//没有权限
-				capi_showmessage_by_data('no_privilege');
+				capi_showmessage_by_data('no_privilege',1,array('reason'=>'no blog privilege'));
 			} elseif(!$tospace['self'] && $blog['friend'] == 4) {
 				//密码输入问题
 				$cookiename = "view_pwd_blog_$blog[blogid]";
 				$cookievalue = empty($_SCOOKIE[$cookiename])?'':$_SCOOKIE[$cookiename];
 				if($cookievalue != md5(md5($blog['password']))) {
-					capi_showmessage_by_data('no_privilege');
+					capi_showmessage_by_data('no_privilege',1,array('reason'=>'error about cookie'));
 				}
 			}
 
@@ -176,13 +176,13 @@ if(capi_submitcheck('commentsubmit')) {
 			//验证隐私
 			if(!ckfriend($bwzt['uid'], $bwzt['friend'], $bwzt['target_ids'])) {
 				//没有权限
-				capi_showmessage_by_data('no_privilege');
+				capi_showmessage_by_data('no_privilege',1,array('reason'=>'no bwzt privilege'));
 			} elseif(!$tospace['self'] && $bwzt['friend'] == 4) {
 				//密码输入问题
 				$cookiename = "view_pwd_bwzt_$bwzt[bwztid]";
 				$cookievalue = empty($_SCOOKIE[$cookiename])?'':$_SCOOKIE[$cookiename];
 				if($cookievalue != md5(md5($bwzt['password']))) {
-					capi_showmessage_by_data('no_privilege');
+					capi_showmessage_by_data('no_privilege',1,array('reason'=>'error about cookie'));
 				}
 			}
 
@@ -536,7 +536,7 @@ if($_GET['op'] == 'edit') {
 
 	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('comment')." WHERE cid='$cid' AND authorid='$_SGLOBAL[supe_uid]'");
 	if(!$comment = $_SGLOBAL['db']->fetch_array($query)) {
-		capi_showmessage_by_data('no_privilege');
+		capi_showmessage_by_data('no_privilege',1,array('reason'=>'error edit'));
 	}
 
 	//提交编辑
@@ -561,7 +561,7 @@ if($_GET['op'] == 'edit') {
 		if(deletecomments(array($cid))) {
 			capi_showmessage_by_data('do_success', 0,array("refer"=>$_POST['refer'] ));
 		} else {
-			capi_showmessage_by_data('no_privilege');
+			capi_showmessage_by_data('no_privilege',1,array('reason'=>'error delete'));
 		}
 	}
 
@@ -574,7 +574,7 @@ if($_GET['op'] == 'edit') {
 
 } else {
 
-	capi_showmessage_by_data('no_privilege');
+	capi_showmessage_by_data('no_privilege',1,array('reason'=>'error op'));
 }
 
 //include template('cp_comment');
