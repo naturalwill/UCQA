@@ -526,7 +526,7 @@ if(capi_submitcheck('commentsubmit')) {
 		}
 	}
 
-	capi_showmessage_by_data($msg ,0,array("refer"=> $_POST['refer'],"magvalues"=> $magvalues));
+	capi_showmessage_by_data($msg ,0,array("refer"=> $_POST['refer'],"commentid"=>$cid));
 }
 
 $cid = empty($_GET['cid'])?0:intval($_GET['cid']);
