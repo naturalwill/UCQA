@@ -30,7 +30,7 @@ function capi_jpush($uid,$message,$title=null,$extras=null){
 		// easy push with ios badge +1
 		$result = $client->push()
 			->setPlatform(M\Platform('android', 'ios'))
-			->setAudience(M\Audience(M\registration_id(array(strval($uid)))))
+			->setAudience(M\Audience(M\alias(array(strval($uid)))))
 			->setNotification(M\notification($message,
 				M\android($message, $title, null, $extras),
 				M\ios($message, null, "+1", true, $extras))
