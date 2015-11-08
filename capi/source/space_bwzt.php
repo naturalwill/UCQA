@@ -262,6 +262,21 @@ if($id) {
 		}
 	} else {
 		
+		//症状分类
+		$query = $_SGLOBAL['db']->query("SELECT bwztclassid, bwztclassname FROM ".tname('bwztclass'));
+		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
+			$bwztclassarr[$value['bwztclassid']] = $value['bwztclassname'];
+		}
+		//科室分类
+		$query = $_SGLOBAL['db']->query("SELECT bwztdivisionid, bwztdivisionname FROM ".tname('bwztdivision'));
+		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
+			$bwztdivisionarr[$value['bwztdivisionid']] = $value['bwztdivisionname'];
+		}
+		
+		if($_GET['view'] == 'class'){
+			capi_showmessage_by_data("do_success", 0,array('bwztclassarr'=>$bwztclassarr,'bwztdivisionarr'=>$bwztdivisionarr));
+		}
+		
 		if($_GET['view'] == 'all') {
 			//大家的日志
 			$wheresql = '1';
@@ -345,16 +360,6 @@ if($id) {
 			}
 		}
 		
-		//症状分类
-		$query = $_SGLOBAL['db']->query("SELECT bwztclassid, bwztclassname FROM ".tname('bwztclass'));
-		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
-			$bwztclassarr[$value['bwztclassid']] = $value['bwztclassname'];
-		}
-		//科室分类
-		$query = $_SGLOBAL['db']->query("SELECT bwztdivisionid, bwztdivisionname FROM ".tname('bwztdivision'));
-		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
-			$bwztdivisionarr[$value['bwztdivisionid']] = $value['bwztdivisionname'];
-		}
 
 		//分类
 		if($bwztclassid) {

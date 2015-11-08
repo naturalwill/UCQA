@@ -15,7 +15,7 @@ if($_SGLOBAL['supe_uid']) {
 	if($member = $_SGLOBAL['db']->fetch_array($query)) {
 		$auth = authcode("$member[password]\t$member[uid]", 'ENCODE');
 		$space = getspace($_SGLOBAL['supe_uid']);
-		capi_showmessage_by_data('do_success', 0, array("space"=>$space, "m_auth"=>rawurlencode($auth)));
+		capi_showmessage_by_data('do_success', 0, array("space"=>$space, "m_auth"=>rawurlencode($auth),"formhash"=>formhash()));
 	}
 	capi_showmessage_by_data('login_failure_please_re_login');
 }
@@ -163,7 +163,7 @@ if(capi_submitcheck('loginsubmit')) {
 	
 	realname_get();
 	
-	capi_showmessage_by_data('login_success',  0, array("space"=>$space, "m_auth"=>rawurlencode($auth)));
+	capi_showmessage_by_data('login_success',  0, array("space"=>$space, "m_auth"=>rawurlencode($auth),"formhash"=>formhash()));
 }
 
 $membername = empty($_SCOOKIE['loginuser'])?'':sstripslashes($_SCOOKIE['loginuser']);
