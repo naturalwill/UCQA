@@ -892,7 +892,7 @@ function template($name) {
 			include_once(S_ROOT.'./source/function_template.php');
 			parse_template($tpl);
 		}
-		elseif(!file_exists($objfile)) {
+		if(!file_exists($objfile)) {
 			include_once(S_ROOT.'./source/function_template.php');
 			parse_template($tpl);
 		}

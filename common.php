@@ -7,7 +7,7 @@
 @define('IN_UCHOME', TRUE);
 define('D_BUG', '1');
 //是否每次都自动更新模板缓存
-define('Flash_Template', '1');
+define('Flash_Template', 0);
 
 D_BUG?error_reporting(7):error_reporting(0);
 set_magic_quotes_runtime(0);
@@ -24,7 +24,7 @@ if(!@include_once(S_ROOT.'./config.php')) {
 	exit();
 }
 include_once(S_ROOT.'./source/function_common.php');
-include_once(S_ROOT.'./capi/function_jpush.php');
+include_once(S_ROOT.'./source/function_jpush.php');
 
 //时间
 $mtime = explode(' ', microtime());

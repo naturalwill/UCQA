@@ -46,7 +46,7 @@ function capi_jpush($uid,$message,$title=null,$extras=null){
 		*/
 		
 		if(D_BUG) {
-			capi_runlog('jpush','Push Success:'.json_encode($result));
+			runlog('jpush','Push Success:'.json_encode($result));
 		}
 	} catch (APIRequestException $e) {
 		/*
@@ -60,7 +60,7 @@ function capi_jpush($uid,$message,$title=null,$extras=null){
 		echo 'rateLimitReset : ' . $e->rateLimitReset . $br;
 		*/
 		if(D_BUG) {
-			capi_runlog('jpush','Push Fail:'.json_encode(array('error'=>$e )));
+			runlog('jpush','Push Fail:'.json_encode(array('error'=>$e )));
 		}
 	} catch (APIConnectionException $e) {
 		/*
@@ -70,7 +70,7 @@ function capi_jpush($uid,$message,$title=null,$extras=null){
 		echo 'IsResponseTimeout: ' . $e->isResponseTimeout . $br;
 		*/
 		if(D_BUG) {
-			capi_runlog('jpush','Push Fail:'.json_encode(array('ErrorMessage'=>$e->getMessage(),'IsResponseTimeout' => $e->isResponseTimeout)));
+			runlog('jpush','Push Fail:'.json_encode(array('ErrorMessage'=>$e->getMessage(),'IsResponseTimeout' => $e->isResponseTimeout)));
 		}
 	}
 

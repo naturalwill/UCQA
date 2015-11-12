@@ -10,7 +10,7 @@ if(!defined('IN_UCHOME')) {
 
 include_once(S_ROOT.'./source/function_bbcode.php');
 
-//共用变量
+//鍏辩敤鍙橀噺
 $tospace = $pic = $blog  = $bwzt = $album = $share = $event = $poll = array();
 
 if(submitcheck('commentsubmit')) {
@@ -22,13 +22,13 @@ if(submitcheck('commentsubmit')) {
 		showmessage('no_privilege');
 	}
 
-	//实名认证
+	//瀹炲悕璁よ瘉
 	ckrealname('comment');
 
-	//新用户见习
+	//鏂扮敤鎴疯涔?
 	cknewuser();
 
-	//判断是否发布太快
+	//鍒ゆ柇鏄惁鍙戝竷澶揩
 	$waittime = interval_check('post');
 	if($waittime > 0) {
 		showmessage('operating_too_fast','',1,array($waittime));
@@ -39,19 +39,19 @@ if(submitcheck('commentsubmit')) {
 		showmessage('content_is_too_short');
 	}
 
-	//摘要
+	//鎽樿
 	$summay = getstr($message, 150, 1, 1, 0, 0, -1);
 
 	$id = intval($_POST['id']);
 
-	//引用评论
+	//寮曠敤璇勮
 	$cid = empty($_POST['cid'])?0:intval($_POST['cid']);
 	$comment = array();
 	if($cid) {
 		$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('comment')." WHERE cid='$cid' AND id='$id' AND idtype='$_POST[idtype]'");
 		$comment = $_SGLOBAL['db']->fetch_array($query);
 		if($comment && $comment['authorid'] != $_SGLOBAL['supe_uid']) {
-			//实名
+			//瀹炲悕
 			if($comment['author'] == '') {
 				$_SN[$comment['authorid']] = lang('hidden_username');
 			} else {
@@ -59,7 +59,7 @@ if(submitcheck('commentsubmit')) {
 				realname_get();
 			}
 			$comment['message'] = preg_replace("/\<div class=\"quote\"\>\<span class=\"q\"\>.*?\<\/span\>\<\/div\>/is", '', $comment['message']);
-			//bbcode转换
+			//bbcode杞崲
 			$comment['message'] = html2bbcode($comment['message']);
 			$message = addslashes("<div class=\"quote\"><span class=\"q\"><b>".$_SN[$comment['authorid']]."</b>: ".getstr($comment['message'], 150, 0, 0, 0, 2, 1).'</span></div>').$message;
 			if($comment['idtype']=='uid') {
@@ -73,42 +73,42 @@ if(submitcheck('commentsubmit')) {
 	$hotarr = array();
 	$stattype = '';
 
-	//检查权限
+	//妫€鏌ユ潈闄?
 	switch ($idtype) {
 		case 'uid':
-			//检索空间
+			//妫€绱㈢┖闂?
 			$tospace = getspace($id);
-			$stattype = 'wall';//统计
+			$stattype = 'wall';//缁熻
 			break;
 		case 'picid':
-			//检索图片
+			//妫€绱㈠浘鐗?
 			$query = $_SGLOBAL['db']->query("SELECT p.*, pf.hotuser
 				FROM ".tname('pic')." p
 				LEFT JOIN ".tname('picfield')." pf
 				ON pf.picid=p.picid
 				WHERE p.picid='$id'");
 			$pic = $_SGLOBAL['db']->fetch_array($query);
-			//图片不存在
+			//鍥剧墖涓嶅瓨鍦?
 			if(empty($pic)) {
 				showmessage('view_images_do_not_exist');
 			}
 
-			//检索空间
+			//妫€绱㈢┖闂?
 			$tospace = getspace($pic['uid']);
 
-			//获取相册
+			//鑾峰彇鐩稿唽
 			$album = array();
 			if($pic['albumid']) {
 				$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('album')." WHERE albumid='$pic[albumid]'");
 				if(!$album = $_SGLOBAL['db']->fetch_array($query)) {
-					updatetable('pic', array('albumid'=>0), array('albumid'=>$pic['albumid']));//相册丢失
+					updatetable('pic', array('albumid'=>0), array('albumid'=>$pic['albumid']));//鐩稿唽涓㈠け
 				}
 			}
-			//验证隐私
+			//楠岃瘉闅愮
 			if(!ckfriend($album['uid'], $album['friend'], $album['target_ids'])) {
 				showmessage('no_privilege');
 			} elseif(!$tospace['self'] && $album['friend'] == 4) {
-				//密码输入问题
+				//瀵嗙爜杈撳叆闂
 				$cookiename = "view_pwd_album_$album[albumid]";
 				$cookievalue = empty($_SCOOKIE[$cookiename])?'':$_SCOOKIE[$cookiename];
 				if($cookievalue != md5(md5($album['password']))) {
@@ -117,29 +117,29 @@ if(submitcheck('commentsubmit')) {
 			}
 			
 			$hotarr = array('picid', $pic['picid'], $pic['hotuser']);
-			$stattype = 'piccomment';//统计
+			$stattype = 'piccomment';//缁熻
 			break;
 		case 'blogid':
-			//读取日志
+			//璇诲彇鏃ュ織
 			$query = $_SGLOBAL['db']->query("SELECT b.*, bf.target_ids, bf.hotuser
 				FROM ".tname('blog')." b
 				LEFT JOIN ".tname('blogfield')." bf ON bf.blogid=b.blogid
 				WHERE b.blogid='$id'");
 			$blog = $_SGLOBAL['db']->fetch_array($query);
-			//日志不存在
+			//鏃ュ織涓嶅瓨鍦?
 			if(empty($blog)) {
 				showmessage('view_to_info_did_not_exist');
 			}
 			
-			//检索空间
+			//妫€绱㈢┖闂?
 			$tospace = getspace($blog['uid']);
 			
-			//验证隐私
+			//楠岃瘉闅愮
 			if(!ckfriend($blog['uid'], $blog['friend'], $blog['target_ids'])) {
-				//没有权限
+				//娌℃湁鏉冮檺
 				showmessage('no_privilege');
 			} elseif(!$tospace['self'] && $blog['friend'] == 4) {
-				//密码输入问题
+				//瀵嗙爜杈撳叆闂
 				$cookiename = "view_pwd_blog_$blog[blogid]";
 				$cookievalue = empty($_SCOOKIE[$cookiename])?'':$_SCOOKIE[$cookiename];
 				if($cookievalue != md5(md5($blog['password']))) {
@@ -147,7 +147,7 @@ if(submitcheck('commentsubmit')) {
 				}
 			}
 
-			//是否允许评论
+			//鏄惁鍏佽璇勮
 			if(!empty($blog['noreply'])) {
 				showmessage('do_not_accept_comments');
 			}
@@ -156,29 +156,29 @@ if(submitcheck('commentsubmit')) {
 			}
 			
 			$hotarr = array('blogid', $blog['blogid'], $blog['hotuser']);
-			$stattype = 'blogcomment';//统计
+			$stattype = 'blogcomment';//缁熻
 			break;
 		case 'bwztid':
-			//读取咨询
+			//璇诲彇鍜ㄨ
 			$query = $_SGLOBAL['db']->query("SELECT b.*, bf.target_ids, bf.hotuser
 				FROM ".tname('bwzt')." b
 				LEFT JOIN ".tname('bwztfield')." bf ON bf.bwztid=b.bwztid
 				WHERE b.bwztid='$id'");
 			$bwzt = $_SGLOBAL['db']->fetch_array($query);
-			//咨询不存在
+			//鍜ㄨ涓嶅瓨鍦?
 			if(empty($bwzt)) {
 				showmessage('view_to_info_did_not_exist');
 			}
 			
-			//检索空间
+			//妫€绱㈢┖闂?
 			$tospace = getspace($bwzt['uid']);
 			
-			//验证隐私
+			//楠岃瘉闅愮
 			if(!ckfriend($bwzt['uid'], $bwzt['friend'], $bwzt['target_ids'])) {
-				//没有权限
+				//娌℃湁鏉冮檺
 				showmessage('no_privilege');
 			} elseif(!$tospace['self'] && $bwzt['friend'] == 4) {
-				//密码输入问题
+				//瀵嗙爜杈撳叆闂
 				$cookiename = "view_pwd_bwzt_$bwzt[bwztid]";
 				$cookievalue = empty($_SCOOKIE[$cookiename])?'':$_SCOOKIE[$cookiename];
 				if($cookievalue != md5(md5($bwzt['password']))) {
@@ -186,7 +186,7 @@ if(submitcheck('commentsubmit')) {
 				}
 			}
 
-			//是否允许评论
+			//鏄惁鍏佽璇勮
 			if(!empty($bwzt['noreply'])) {
 				showmessage('do_not_accept_comments');
 			}
@@ -195,22 +195,22 @@ if(submitcheck('commentsubmit')) {
 			}
 			
 			$hotarr = array('bwztid', $bwzt['bwztid'], $bwzt['hotuser']);
-			$stattype = 'bwztcomment';//统计
+			$stattype = 'bwztcomment';//缁熻
 			break;
 		case 'sid':
-			//读取日志
+			//璇诲彇鏃ュ織
 			$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('share')." WHERE sid='$id'");
 			$share = $_SGLOBAL['db']->fetch_array($query);
-			//日志不存在
+			//鏃ュ織涓嶅瓨鍦?
 			if(empty($share)) {
 				showmessage('sharing_does_not_exist');
 			}
 
-			//检索空间
+			//妫€绱㈢┖闂?
 			$tospace = getspace($share['uid']);
 			
 			$hotarr = array('sid', $share['sid'], $share['hotuser']);
-			$stattype = 'sharecomment';//统计
+			$stattype = 'sharecomment';//缁熻
 			break;
 		case 'pid':
 			$query = $_SGLOBAL['db']->query("SELECT p.*, pf.hotuser
@@ -221,20 +221,20 @@ if(submitcheck('commentsubmit')) {
 			if(empty($poll)) {
 				showmessage('voting_does_not_exist');
 			}
-			//是否允许评论
+			//鏄惁鍏佽璇勮
 			$tospace = getspace($poll['uid']);
 			if($poll['noreply']) {
-				//是否好友
+				//鏄惁濂藉弸
 				if(!$tospace['self'] && !in_array($_SGLOBAL['supe_uid'], $tospace['friends'])) {
 					showmessage('the_vote_only_allows_friends_to_comment');
 				}
 			}
 			
 			$hotarr = array('pid', $poll['pid'], $poll['hotuser']);
-			$stattype = 'pollcomment';//统计
+			$stattype = 'pollcomment';//缁熻
 			break;
 		case 'eventid':
-		    // 读取活动
+		    // 璇诲彇娲诲姩
 		    $query = $_SGLOBAL['db']->query("SELECT e.*, ef.* FROM ".tname('event')." e LEFT JOIN ".tname("eventfield")." ef ON e.eventid=ef.eventid WHERE e.eventid='$id'");
 			$event = $_SGLOBAL['db']->fetch_array($query);
 
@@ -243,24 +243,24 @@ if(submitcheck('commentsubmit')) {
 			}
 			
 			if($event['grade'] < -1){
-				showmessage('event_is_closed');//活动已经关闭
+				showmessage('event_is_closed');//娲诲姩宸茬粡鍏抽棴
 			} elseif($event['grade'] <= 0){
-				showmessage('event_under_verify');//活动未通过审核
+				showmessage('event_under_verify');//娲诲姩鏈€氳繃瀹℃牳
 			}
 			
 			if(!$event['allowpost']){
 				$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname("userevent")." WHERE eventid='$id' AND uid='$_SGLOBAL[supe_uid]' LIMIT 1");
 				$value = $_SGLOBAL['db']->fetch_array($query);
 				if(empty($value) || $value['status'] < 2){
-					showmessage('event_only_allows_members_to_comment');//只有活动成员允许发表留言
+					showmessage('event_only_allows_members_to_comment');//鍙湁娲诲姩鎴愬憳鍏佽鍙戣〃鐣欒█
 				}
 			}
 
-			//检索空间
+			//妫€绱㈢┖闂?
 			$tospace = getspace($event['uid']);
 			
 			$hotarr = array('eventid', $event['eventid'], $event['hotuser']);
-			$stattype = 'eventcomment';//统计
+			$stattype = 'eventcomment';//缁熻
 			break;
 		default:
 			showmessage('non_normal_operation');
@@ -271,7 +271,7 @@ if(submitcheck('commentsubmit')) {
 		showmessage('space_does_not_exist');
 	}
 	
-	//视频认证
+	//瑙嗛璁よ瘉
 	if($tospace['videostatus']) {
 		if($idtype == 'uid') {
 			ckvideophoto('wall', $tospace);
@@ -280,24 +280,24 @@ if(submitcheck('commentsubmit')) {
 		}
 	}
 	
-	//黑名单
+	//榛戝悕鍗?
 	if(isblacklist($tospace['uid'])) {
 		showmessage('is_blacklist');
 	}
 	
-	//热点
+	//鐑偣
 	if($hotarr && $tospace['uid'] != $_SGLOBAL['supe_uid']) {
 		hot_update($hotarr[0], $hotarr[1], $hotarr[2]);
 	}
 
-	//事件
+	//浜嬩欢
 	$fs = array();
 	$fs['icon'] = 'comment';
 	$fs['target_ids'] = $fs['friend'] = '';
 
 	switch ($_POST['idtype']) {
 		case 'uid':
-			//事件
+			//浜嬩欢
 			$fs['icon'] = 'wall';
 			$fs['title_template'] = cplang('feed_comment_space');
 			$fs['title_data'] = array('touser'=>"<a href=\"space.php?uid=$tospace[uid]\">".$_SN[$tospace['uid']]."</a>");
@@ -308,7 +308,7 @@ if(submitcheck('commentsubmit')) {
 			$fs['image_links'] = array();
 			break;
 		case 'picid':
-			//事件
+			//浜嬩欢
 			$fs['title_template'] = cplang('feed_comment_image');
 			$fs['title_data'] = array('touser'=>"<a href=\"space.php?uid=$tospace[uid]\">".$_SN[$tospace['uid']]."</a>");
 			$fs['body_template'] = '{pic_title}';
@@ -320,9 +320,9 @@ if(submitcheck('commentsubmit')) {
 			$fs['friend'] = $album['friend'];
 			break;
 		case 'blogid':
-			//更新评论统计
+			//鏇存柊璇勮缁熻
 			$_SGLOBAL['db']->query("UPDATE ".tname('blog')." SET replynum=replynum+1 WHERE blogid='$id'");
-			//事件
+			//浜嬩欢
 			$fs['title_template'] = cplang('feed_comment_blog');
 			$fs['title_data'] = array('touser'=>"<a href=\"space.php?uid=$tospace[uid]\">".$_SN[$tospace['uid']]."</a>", 'blog'=>"<a href=\"space.php?uid=$tospace[uid]&do=blog&id=$id\">$blog[subject]</a>");
 			$fs['body_template'] = '';
@@ -332,9 +332,9 @@ if(submitcheck('commentsubmit')) {
 			$fs['friend'] = $blog['friend'];
 			break;
 		case 'bwztid':
-			//更新评论统计
+			//鏇存柊璇勮缁熻
 			$_SGLOBAL['db']->query("UPDATE ".tname('bwzt')." SET replynum=replynum+1 WHERE bwztid='$id'");
-			//事件
+			//浜嬩欢
 			$fs['title_template'] = cplang('feed_comment_bwzt');
 			$fs['title_data'] = array('touser'=>"<a href=\"space.php?uid=$tospace[uid]\">".$_SN[$tospace['uid']]."</a>", 'bwzt'=>"<a href=\"space.php?uid=$tospace[uid]&do=bwzt&id=$id\">$bwzt[subject]</a>");
 			$fs['body_template'] = '';
@@ -345,7 +345,7 @@ if(submitcheck('commentsubmit')) {
 			break;
 			
 		case 'sid':
-			//事件
+			//浜嬩欢
 			$fs['title_template'] = cplang('feed_comment_share');
 			$fs['title_data'] = array('touser'=>"<a href=\"space.php?uid=$tospace[uid]\">".$_SN[$tospace['uid']]."</a>", 'share'=>"<a href=\"space.php?uid=$tospace[uid]&do=share&id=$id\">".str_replace(cplang('share_action'), '', $share['title_template'])."</a>");
 			$fs['body_template'] = '';
@@ -353,7 +353,7 @@ if(submitcheck('commentsubmit')) {
 			$fs['body_general'] = '';
 			break;
 		case 'eventid':
-		    // 活动
+		    // 娲诲姩
 		    $fs['title_template'] = cplang('feed_comment_event');
 			$fs['title_data'] = array('touser'=>"<a href=\"space.php?uid=$tospace[uid]\">".$_SN[$tospace['uid']]."</a>", 'event'=>'<a href="space.php?do=event&id='.$event['eventid'].'">'.$event['title'].'</a>');
 			$fs['body_template'] = '';
@@ -361,8 +361,8 @@ if(submitcheck('commentsubmit')) {
 			$fs['body_general'] = '';
 			break;
 		case 'pid':
-			// 投票
-			//更新评论统计
+			// 鎶曠エ
+			//鏇存柊璇勮缁熻
 			$_SGLOBAL['db']->query("UPDATE ".tname('poll')." SET replynum=replynum+1 WHERE pid='$id'");
 			$fs['title_template'] = cplang('feed_comment_poll');
 			$fs['title_data'] = array('touser'=>"<a href=\"space.php?uid=$tospace[uid]\">".$_SN[$tospace['uid']]."</a>", 'poll'=>"<a href=\"space.php?uid=$tospace[uid]&do=poll&pid=$id\">$poll[subject]</a>");
@@ -383,7 +383,7 @@ if(submitcheck('commentsubmit')) {
 		'message' => $message,
 		'ip' => getonlineip()
 	);
-	//入库
+	//鍏ュ簱
 	$cid = inserttable('comment', $setarr, 1);
 	$action = 'comment';
 	$becomment = 'getcomment';
@@ -417,7 +417,7 @@ if(submitcheck('commentsubmit')) {
 			$q_msgtype = 'photo_comment_reply';
 			break;
 		case 'blogid':
-			//通知
+			//閫氱煡
 			$n_url = "space.php?uid=$tospace[uid]&do=blog&id=$id&cid=$cid";
 			$note_type = 'blogcomment';
 			$note = cplang('note_blog_comment', array($n_url, $blog['subject']));
@@ -428,7 +428,7 @@ if(submitcheck('commentsubmit')) {
 			$q_msgtype = 'blog_comment_reply';
 			break;
 		case 'bwztid':
-			//通知
+			//閫氱煡
 			$n_url = "space.php?uid=$tospace[uid]&do=bwzt&id=$id&cid=$cid";
 			$note_type = 'bwztcomment';
 			$note = cplang('note_bwzt_comment', array($n_url, $bwzt['subject']));
@@ -439,7 +439,7 @@ if(submitcheck('commentsubmit')) {
 			$q_msgtype = 'bwzt_comment_reply';
 			break;
 		case 'sid':
-			//分享
+			//鍒嗕韩
 			$n_url = "space.php?uid=$tospace[uid]&do=share&id=$id&cid=$cid";
 			$note_type = 'sharecomment';
 			$note = cplang('note_share_comment', array($n_url));
@@ -460,7 +460,7 @@ if(submitcheck('commentsubmit')) {
 			$q_msgtype = 'poll_comment_reply';
 			break;
 		case 'eventid':
-		    // 活动
+		    // 娲诲姩
 		    $n_url = "space.php?do=event&id=$id&view=comment&cid=$cid";
 		    $note_type = 'eventcomment';
 		    $note = cplang('note_event_comment', array($n_url));
@@ -474,40 +474,40 @@ if(submitcheck('commentsubmit')) {
 
 	if(empty($comment)) {
 		
-		//非引用评论
+		//闈炲紩鐢ㄨ瘎璁?
 		if($tospace['uid'] != $_SGLOBAL['supe_uid']) {
-			//事件发布
+			//浜嬩欢鍙戝竷
 			if(ckprivacy('comment', 1)) {
 				feed_add($fs['icon'], $fs['title_template'], $fs['title_data'], $fs['body_template'], $fs['body_data'], $fs['body_general'],$fs['images'], $fs['image_links'], $fs['target_ids'], $fs['friend']);
 			}
 			
-			//发送通知
+			//鍙戦€侀€氱煡
 			notification_add($tospace['uid'], $note_type, $note);
 			
-			//留言发送短消息
+			//鐣欒█鍙戦€佺煭娑堟伅
 			if($_POST['idtype'] == 'uid' && $tospace['updatetime'] == $tospace['dateline']) {
 				include_once S_ROOT.'./uc_client/client.php';
 				uc_pm_send($_SGLOBAL['supe_uid'], $tospace['uid'], cplang('wall_pm_subject'), cplang('wall_pm_message', array(addslashes(getsiteurl().$n_url))), 1, 0, 0);
 			}
 			
-			//发送邮件通知
+			//鍙戦€侀偖浠堕€氱煡
 			smail($tospace['uid'], '', cplang($msgtype, array($_SN[$space['uid']], shtmlspecialchars(getsiteurl().$n_url))), '', $msgtype);
 		}
 		
 	} elseif($comment['authorid'] != $_SGLOBAL['supe_uid']) {
 		
-		//发送邮件通知
+		//鍙戦€侀偖浠堕€氱煡
 		smail($comment['authorid'], '', cplang($q_msgtype, array($_SN[$space['uid']], shtmlspecialchars(getsiteurl().$n_url))), '', $q_msgtype);
 		notification_add($comment['authorid'], $note_type, $q_note);
 		
 	}
 	
-	//统计
+	//缁熻
 	if($stattype) {
 		updatestat($stattype);
 	}
 
-	//积分
+	//绉垎
 	if($tospace['uid'] != $_SGLOBAL['supe_uid']) {
 		$needle = $id;
 		if($_POST['idtype'] != 'uid') {
@@ -515,9 +515,9 @@ if(submitcheck('commentsubmit')) {
 		} else {
 			$needle = $tospace['uid'];
 		}
-		//奖励评论发起者
+		//濂栧姳璇勮鍙戣捣鑰?
 		getreward($action, 1, 0, $needle);
-		//奖励被评论者
+		//濂栧姳琚瘎璁鸿€?
 		if($becomment) {
 			if($_POST['idtype'] == 'uid') {
 				$needle = $_SGLOBAL['supe_uid'];
@@ -525,7 +525,7 @@ if(submitcheck('commentsubmit')) {
 			getreward($becomment, 1, $tospace['uid'], $needle, 0);
 		}
 	}
-	$pushmessage=$setarr['author'].' 回复了你: '. $setarr['message'];
+	$pushmessage=$setarr['author'].' 鍥炲浜嗕綘: '. $setarr['message'];
 	capi_jpush($setarr['uid'], $pushmessage, null, array("commentid"=>$cid,'uid'=>$setarr['uid'],'id'=>$setarr['id'],'idtype'=>$setarr['idtype']));
 
 	showmessage($msg, $_POST['refer'], 0, $magvalues);
@@ -533,7 +533,7 @@ if(submitcheck('commentsubmit')) {
 
 $cid = empty($_GET['cid'])?0:intval($_GET['cid']);
 
-//编辑
+//缂栬緫
 if($_GET['op'] == 'edit') {
 
 	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('comment')." WHERE cid='$cid' AND authorid='$_SGLOBAL[supe_uid]'");
@@ -541,7 +541,7 @@ if($_GET['op'] == 'edit') {
 		showmessage('no_privilege');
 	}
 
-	//提交编辑
+	//鎻愪氦缂栬緫
 	if(submitcheck('editsubmit')) {
 
 		$message = getstr($_POST['message'], 0, 1, 1, 1, 2);
@@ -552,8 +552,8 @@ if($_GET['op'] == 'edit') {
 		showmessage('do_success', $_POST['refer'], 0);
 	}
 
-	//bbcode转换
-	$comment['message'] = html2bbcode($comment['message']);//显示用
+	//bbcode杞崲
+	$comment['message'] = html2bbcode($comment['message']);//鏄剧ず鐢?
 
 } elseif($_GET['op'] == 'delete') {
 
