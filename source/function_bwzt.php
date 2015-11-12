@@ -108,11 +108,6 @@ function bwzt_post($POST, $olds=array()) {
 	} else {
 		$bwztclassid = $olds['bwztclassid'];
 	}
-	if($bwztclassid && empty($bwztclassname)) {
-		//是否是自己的
-		$bwztclassname = getcount('bwztclass', array('bwztclassid'=>$bwztclassid, 'uid'=>$_SGLOBAL['supe_uid']), 'bwztclassname');
-		if(empty($bwztclassname)) $bwztclassid = 0;
-	}
 	
 
 	//new
@@ -142,11 +137,6 @@ function bwzt_post($POST, $olds=array()) {
 		}
 	} else {
 		$bwztdivisionid = $olds['bwztdivisionid'];
-	}
-	if($bwztdivisionid && empty($bwztdivisionname)) {
-		//是否是自己的
-		$bwztdivisionname = getcount('bwztdivision', array('bwztdivisionid'=>$bwztdivisionid, 'uid'=>$_SGLOBAL['supe_uid']), 'bwztdivisionname');
-		if(empty($bwztdivisionname)) $bwztdivisionid = 0;
 	}
 	
 	//主表

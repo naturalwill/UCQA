@@ -525,9 +525,9 @@ if(capi_submitcheck('commentsubmit')) {
 			getreward($becomment, 1, $tospace['uid'], $needle, 0);
 		}
 	}
+	
 	$pushmessage=$setarr['author'].' 回复了你: '. $setarr['message'];
-	//var_dump( $pushmessage);exit();
-	capi_jpush($setarr['uid'], $pushmessage, null, array("commentid"=>$cid));
+	capi_jpush($setarr['uid'], $pushmessage, null, array("commentid"=>$cid,'uid'=>$setarr['uid'],'id'=>$setarr['id'],'idtype'=>$setarr['idtype']));
 
 	capi_showmessage_by_data($msg ,0,array("commentid"=>$cid, "refer"=> $_POST['refer']));
 }
