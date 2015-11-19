@@ -13,10 +13,12 @@ $op = empty($_GET['op'])?'':trim($_GET['op']);
 if($op == 'logout') {
 	
 	if($_GET['uhash'] == $_SGLOBAL['uhash']) {
+		$show=array();
 		//删除session
 		if($_SGLOBAL['supe_uid']) {
 			$_SGLOBAL['db']->query("DELETE FROM ".tname('session')." WHERE uid='$_SGLOBAL[supe_uid]'");
 			$_SGLOBAL['db']->query("DELETE FROM ".tname('adminsession')." WHERE uid='$_SGLOBAL[supe_uid]'");//管理平台
+			$show['unset_session']=TRUE;
 		}
 	
 		if($_SCONFIG['uc_status']) {
@@ -25,11 +27,13 @@ if($op == 'logout') {
 		} else {
 			$ucsynlogout = '';
 		}
+		$show['ucsynlogout']=$ucsynlogout;
 	
 		clearcookie();
 		ssetcookie('_refer', '');
+		capi_showmessage_by_data('security_exit', 0,  $show);
 	}
-	capi_showmessage_by_data('security_exit', 0,  array($ucsynlogout));
+	capi_showmessage_by_data('to_login');
 
 } elseif($op == 'seccode') {
 

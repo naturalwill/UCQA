@@ -19,7 +19,8 @@ if($_SGLOBAL['supe_uid']) {
 		//增加用户头像地址
 		$space['avatar_default_url'] = avatar_default();
 		$space['avatar_url'] = avatar($space['uid'],'small',TRUE);
-		capi_showmessage_by_data('do_success', 0, array("space"=>$space, "m_auth"=>rawurlencode($auth),"formhash"=>formhash()));
+		
+		capi_showmessage_by_data('do_success', 0, array("m_auth"=>rawurlencode($auth), 'uhash'=> $_SGLOBAL['uhash']/* 用于注销 */, "formhash"=>formhash(), "space"=>$space));
 	}
 	capi_showmessage_by_data('login_failure_please_re_login');
 }
@@ -170,7 +171,7 @@ if(capi_submitcheck('loginsubmit')) {
 	//增加用户头像地址
 	$space['avatar_default_url'] = avatar_default();
 	$space['avatar_url'] = avatar($space['uid'],'small',TRUE);
-	capi_showmessage_by_data('login_success',  0, array("space"=>$space, "m_auth"=>rawurlencode($auth),"formhash"=>formhash()));
+	capi_showmessage_by_data('login_success',  0, array("m_auth"=>rawurlencode($auth), 'uhash'=> $_SGLOBAL['uhash']/* 用于注销 */, "formhash"=>formhash(), "space"=>$space));
 }
 
 $membername = empty($_SCOOKIE['loginuser'])?'':sstripslashes($_SCOOKIE['loginuser']);
