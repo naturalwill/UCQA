@@ -10,4 +10,6 @@ A question and answer program.
 
 [UCQA-wiki](https://github.com/NaturalWill/UCQA/wiki)
 
-[CAPI Document](https://github.com/NaturalWill/UCQA/wiki/CAPI-Document)
+[CAPI bwzt Interface](https://github.com/NaturalWill/UCQA/wiki/capi-bwzt)
+
+[CAPI User Interface](https://github.com/NaturalWill/UCQA/wiki/capi-user)
