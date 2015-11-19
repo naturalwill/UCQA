@@ -1575,8 +1575,19 @@ function avatar($uid, $size='small', $returnsrc = FALSE) {
 	
 	$size = in_array($size, array('big', 'middle', 'small')) ? $size : 'small';
 	$avatarfile = avatar_file($uid, $size);
-	return $returnsrc ? UC_API.'/data/avatar/'.$avatarfile : '<img src="'.UC_API.'/data/avatar/'.$avatarfile.'" onerror="this.onerror=null;this.src=\''.UC_API.'/images/noavatar_'.$size.'.gif\'">';
+	$avatarurl=UC_API.'/data/avatar/'.$avatarfile;
+	$noavatarurl=UC_API.'/images/noavatar_'.$size.'.gif';
+	return $returnsrc ? $avatarurl : '<img src="'.$avatarurl.'" onerror="this.onerror=null;this.src=\''.$noavatarurl.'\'">';
 }
+
+//处理头像
+function avatar_default($size='small') {
+	global $_SCONFIG, $_SN;
+	$size = in_array($size, array('big', 'middle', 'small')) ? $size : 'small';
+	$noavatarurl=UC_API.'/images/noavatar_'.$size.'.gif';
+	return $noavatarurl ;
+}
+
 
 //得到头像
 function avatar_file($uid, $size) {

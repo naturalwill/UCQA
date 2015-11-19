@@ -12,7 +12,7 @@ if(!defined('IN_UCHOME')) {
 $avatar_size=$_GET['avatar_size'];
 $get_avatar=$_GET['get_avatar'];
 if(!empty($get_avatar)&&!empty($avatar_size)){
-	capi_showmessage_by_data('do_success', 0, array('avatar_url'=>avatar($space[uid],$avatar_size,TRUE)));
+	capi_showmessage_by_data('do_success', 0, array('avatar_url'=>avatar($space['uid'],$avatar_size,TRUE)));
 }
 
 if(submitcheck('avatarsubmit')) {

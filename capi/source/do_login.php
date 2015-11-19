@@ -15,6 +15,10 @@ if($_SGLOBAL['supe_uid']) {
 	if($member = $_SGLOBAL['db']->fetch_array($query)) {
 		$auth = authcode("$member[password]\t$member[uid]", 'ENCODE');
 		$space = getspace($_SGLOBAL['supe_uid']);
+		
+		//å¢žåŠ ç”¨æˆ·å¤´åƒåœ°å€
+		$space['avatar_default_url'] = avatar_default();
+		$space['avatar_url'] = avatar($space['uid'],'small',TRUE);
 		capi_showmessage_by_data('do_success', 0, array("space"=>$space, "m_auth"=>rawurlencode($auth),"formhash"=>formhash()));
 	}
 	capi_showmessage_by_data('login_failure_please_re_login');
@@ -29,7 +33,7 @@ if(empty($refer)) {
 	$refer = 'space.php?do=home';
 }
 
-//ºÃÓÑÑûÇë
+//å¥½å‹é‚€è¯·
 $uid = empty($_REQUEST['uid'])?0:intval($_REQUEST['uid']);
 $code = empty($_REQUEST['code'])?'':$_REQUEST['code'];
 $app = empty($_REQUEST['app'])?'':intval($_REQUEST['app']);
@@ -38,7 +42,7 @@ $invitearr = array();
 $reward = getreward('invitecode', 0);
 if($uid && $code && !$reward['credit']) {
 	$m_space = getspace($uid);
-	if($code == space_key($m_space, $app)) {//ÑéÖ¤Í¨¹ý
+	if($code == space_key($m_space, $app)) {//éªŒè¯é€šè¿‡
 		$invitearr['uid'] = $uid;
 		$invitearr['username'] = $m_space['username'];
 	}
@@ -49,7 +53,7 @@ if($uid && $code && !$reward['credit']) {
 	$url_plus = "uid=$uid&invite=$invite";
 }
 
-//Ã»ÓÐµÇÂ¼±íµ¥
+//æ²¡æœ‰ç™»å½•è¡¨å•
 $_SGLOBAL['nologinform'] = 1;
 
 if(capi_submitcheck('loginsubmit')) {
@@ -74,7 +78,7 @@ if(capi_submitcheck('loginsubmit')) {
 		}
 	}
 
-	//Í¬²½»ñÈ¡ÓÃ»§Ô´
+	//åŒæ­¥èŽ·å–ç”¨æˆ·æº
 	if(!$passport = getpassport($username, $password)) {
 		capi_showmessage_by_data('login_failure_please_re_login', 1, 'do.php?ac='.$_SCONFIG['login_action']);
 	}
@@ -82,11 +86,11 @@ if(capi_submitcheck('loginsubmit')) {
 	$setarr = array(
 		'uid' => $passport['uid'],
 		'username' => addslashes($passport['username']),
-		'password' => md5("$passport[uid]|$_SGLOBAL[timestamp]")//±¾µØÃÜÂëËæ»úÉú³É
+		'password' => md5("$passport[uid]|$_SGLOBAL[timestamp]")//æœ¬åœ°å¯†ç éšæœºç”Ÿæˆ
 	);
 	
 	include_once(S_ROOT.'./source/function_space.php');
-	//¿ªÍ¨¿Õ¼ä
+	//å¼€é€šç©ºé—´
 	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('space')." WHERE uid='$setarr[uid]'");
 	if(!$space = $_SGLOBAL['db']->fetch_array($query)) {
 		$space = space_open($setarr['uid'], $setarr['username'], 0, $passport['email']);
@@ -94,27 +98,27 @@ if(capi_submitcheck('loginsubmit')) {
 	
 	$_SGLOBAL['member'] = $space;
 	
-	//ÊµÃû
+	//å®žå
 	realname_set($space['uid'], $space['username'], $space['name'], $space['namestatus']);
 	
-	//¼ìË÷µ±Ç°ÓÃ»§
+	//æ£€ç´¢å½“å‰ç”¨æˆ·
 	$query = $_SGLOBAL['db']->query("SELECT password FROM ".tname('member')." WHERE uid='$setarr[uid]'");
 	if($value = $_SGLOBAL['db']->fetch_array($query)) {
 		$setarr['password'] = addslashes($value['password']);
 	} else {
-		//¸üÐÂ±¾µØÓÃ»§¿â
+		//æ›´æ–°æœ¬åœ°ç”¨æˆ·åº“
 		inserttable('member', $setarr, 0, true);
 	}
 
-	//ÇåÀíÔÚÏßsession
+	//æ¸…ç†åœ¨çº¿session
 	insertsession($setarr);
 	$auth = authcode("$setarr[password]\t$setarr[uid]", 'ENCODE');
-	//ÉèÖÃcookie
+	//è®¾ç½®cookie
 	ssetcookie('auth', $auth, $cookietime);
 	ssetcookie('loginuser', $passport['username'], 31536000);
 	ssetcookie('_refer', '');
 	
-	//Í¬²½µÇÂ¼
+	//åŒæ­¥ç™»å½•
 	if($_SCONFIG['uc_status']) {
 		include_once S_ROOT.'./uc_client/client.php';
 		$ucsynlogin = uc_user_synlogin($setarr['uid']);
@@ -122,19 +126,19 @@ if(capi_submitcheck('loginsubmit')) {
 		$ucsynlogin = '';
 	}
 	
-	//ºÃÓÑÑûÇë
+	//å¥½å‹é‚€è¯·
 	if($invitearr) {
-		//³ÉÎªºÃÓÑ
+		//æˆä¸ºå¥½å‹
 		invite_update($invitearr['id'], $setarr['uid'], $setarr['username'], $invitearr['uid'], $invitearr['username'], $app);
 	}
 	$_SGLOBAL['supe_uid'] = $space['uid'];
-	//ÅÐ¶ÏÓÃ»§ÊÇ·ñÉèÖÃÁËÍ·Ïñ
+	//åˆ¤æ–­ç”¨æˆ·æ˜¯å¦è®¾ç½®äº†å¤´åƒ
 	$reward = $setarr = array();
 	$experience = $credit = 0;
 	$avatar_exists = ckavatar($space['uid']);
 	if($avatar_exists) {
 		if(!$space['avatar']) {
-			//½±Àø»ý·Ö
+			//å¥–åŠ±ç§¯åˆ†
 			$reward = getreward('setavatar', 0);
 			$credit = $reward['credit'];
 			$experience = $reward['experience'];
@@ -162,7 +166,10 @@ if(capi_submitcheck('loginsubmit')) {
 	}
 	
 	realname_get();
-	
+
+	//å¢žåŠ ç”¨æˆ·å¤´åƒåœ°å€
+	$space['avatar_default_url'] = avatar_default();
+	$space['avatar_url'] = avatar($space['uid'],'small',TRUE);
 	capi_showmessage_by_data('login_success',  0, array("space"=>$space, "m_auth"=>rawurlencode($auth),"formhash"=>formhash()));
 }
 

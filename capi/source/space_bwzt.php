@@ -209,6 +209,8 @@ if($id) {
 	$commenttip=array("commentsubmit"=>true,"formhash"=>formhash(),"id"=>$bwzt[bwztid],"idtype"=>"bwztid","message"=>"","refer"=>"");
 	$bwzt["replylist"]=$list;
 	$bwzt["comment"]=$commenttip;
+	//增加发布者头像地址
+	$bwzt['avatar_url'] = avatar($bwzt['uid'],'small',TRUE);
 	capi_showmessage_by_data("do_success",0, array('bwzt'=>$bwzt));
 } else {
 	//分页
@@ -411,6 +413,9 @@ if($id) {
 				}
 				if($value['pic']) $value['pic'] = pic_cover_get($value['pic'], $value['picflag']);
 				$value['pics']=json_decode($value['pics']);//json解密picurls
+				
+				//增加发布者头像地址
+				$value['avatar_url'] = avatar($value['uid'],'small',TRUE);
 				$list[] = $value;
 			} else {
 				$pricount++;
