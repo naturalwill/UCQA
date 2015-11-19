@@ -72,7 +72,7 @@ if (submitcheck('ucsubmit')) {
 	$ucapi = preg_replace("/\/$/", '', trim($_POST['ucapi']));
 	$ucip = trim($_POST['ucip']);
 
-	if(empty($ucapi) || !preg_match("/^(https?:\/\/)/i", $ucapi)) {
+	if(empty($ucapi) || !preg_match("/^((http|https):\/\/)/i", $ucapi)) {
 		show_msg('UCenter的URL地址不正确');
 	} else {
 		//检查服务器 dns 解析是否正常, dns 解析不正常则要求用户输入ucenter的ip地址
@@ -89,7 +89,7 @@ if (submitcheck('ucsubmit')) {
 	if(!@include_once S_ROOT.'./uc_client/client.php') {
 		show_msg('uc_client目录不存在，请上传安装包中的 ./upload/uc_client 到程序根目录');
 	}
-	$ucinfo = uc_fopen2($ucapi.'/index.php?m=app&a=ucinfo&release='.UC_CLIENT_RELEASE, 500, '', '', 1, $ucip);
+	$ucinfo = curl_fopen($ucapi.'/index.php?m=app&a=ucinfo&release='.UC_CLIENT_RELEASE, 500, '', '', 1, $ucip);
 	list($status, $ucversion, $ucrelease, $uccharset, $ucdbcharset, $apptypes) = explode('|', $ucinfo);
 	$dbcharset = strtolower(trim($_SC['dbcharset'] ? str_replace('-', '', $_SC['dbcharset']) : $_SC['dbcharset']));
 	$ucdbcharset = strtolower(trim($ucdbcharset ? str_replace('-', '', $ucdbcharset) : $ucdbcharset));
@@ -118,19 +118,35 @@ END;
 	} elseif(strexists($apptypes, 'uchome')) {
 		show_msg('已经安装过一个UCenter Home产品，如果想继续安装，请先到 UCenter 应用管理中删除已有的UCenter Home！');
 	}
-	$tagtemplates = 'apptagtemplates[template]='.urlencode('<a href="{url}" target="_blank">{subject}</a>').'&'.
-		'apptagtemplates[fields][subject]='.urlencode('日志标题').'&'.
-		'apptagtemplates[fields][uid]='.urlencode('用户 ID').'&'.
-		'apptagtemplates[fields][username]='.urlencode('用户名').'&'.
-		'apptagtemplates[fields][dateline]='.urlencode('日期').'&'.
-		'apptagtemplates[fields][spaceurl]='.urlencode('空间地址').'&'.
-		'apptagtemplates[fields][url]='.urlencode('日志地址');
+	$tagtemplates = array(
+						'apptagtemplates[template]' => '<a href="{url}" target="_blank">{subject}</a>',
+						'apptagtemplates[fields][subject]' => '日志标题',
+						'apptagtemplates[fields][uid]' => '用户 ID',
+						'apptagtemplates[fields][username]' => '用户名',
+						'apptagtemplates[fields][dateline]' => '日期',
+						'apptagtemplates[fields][spaceurl]' => '空间地址',
+						'apptagtemplates[fields][url]' => '日志地址',
+					);
 
 	$uri = $_SERVER['REQUEST_URI']?$_SERVER['REQUEST_URI']:($_SERVER['PHP_SELF']?$_SERVER['PHP_SELF']:$_SERVER['SCRIPT_NAME']);
 	$app_url = strtolower(substr($_SERVER['SERVER_PROTOCOL'], 0, strpos($_SERVER['SERVER_PROTOCOL'], '/'))).'://'.$_SERVER['HTTP_HOST'].preg_replace("/\/*install$/i", '', substr($uri, 0, strrpos($uri, '/install')));
 
-	$postdata = "m=app&a=add&ucfounder=&ucfounderpw=".urlencode($_POST['ucfounderpw'])."&apptype=".urlencode('UCHOME')."&appname=".urlencode('个人家园')."&appurl=".urlencode($app_url)."&appip=&appcharset=".$_SC['charset'].'&appdbcharset='.$_SC['dbcharset'].'&release='.UC_CLIENT_RELEASE.'&'.$tagtemplates;
-	$s = uc_fopen2($ucapi.'/index.php', 500, $postdata, '', 1, $ucip);
+	$postdata = array_merge(array(
+					'm' => 'app',
+					'a' => 'add',
+					'ucfounder' => '',
+					'ucfounderpw' =>  $_POST['ucfounderpw'] ,
+					'apptype' =>  'UCHOME' ,
+					'appname' =>  '个人家园' ,
+					'appurl' =>  $app_url ,
+					'appip' => '',
+					'appcharset' =>  $_SC['charset'] ,
+					'appdbcharset' =>  $_SC['dbcharset'] ,
+					'release' =>  UC_CLIENT_RELEASE ,
+				),
+				$tagtemplates);	
+				
+	$s = curl_fopen($ucapi.'/index.php', 500, $postdata, '', 1, $ucip);
 	if(empty($s)) {
 		show_msg('UCenter用户中心无法连接');
 	} elseif($s == '-1') {
