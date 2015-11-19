@@ -1724,6 +1724,7 @@ CREATE TABLE IF NOT EXISTS `uchome_bwzt` (
   `click_3` smallint(6) unsigned NOT NULL DEFAULT '0',
   `click_4` smallint(6) unsigned NOT NULL DEFAULT '0',
   `click_5` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `status` tinyint(1) NOT NULL DEFAULT '0',
   `pics` text NOT NULL ,
   PRIMARY KEY (`bwztid`),
   KEY `uid` (`uid`,`dateline`),
