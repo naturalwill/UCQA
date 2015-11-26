@@ -13,7 +13,8 @@ if($space['namestatus']) {
 	include_once(S_ROOT.'./source/function_cp.php');
 	if(!ckrealname('viewspace', 1)) {
 		$_SGLOBAL['realname_privacy'] = 1;
-		include template('space_privacy');
+		//include template('space_privacy');
+		capi_showmessage_by_data('space_privacy');
 		exit();
 	}
 }
@@ -291,8 +292,8 @@ $_SGLOBAL['ad'] = array();
 $_GET['view'] = 'me';
 
 $_TPL['css'] = 'space';
-include_once template("space_index");
-
+//include_once template("space_index");
+capi_showmessage_by_data('do_success', 0, array("space"=>$space));
 //╬╨╪шеецШ
 function show_credit() {
 	global $_SGLOBAL, $space;

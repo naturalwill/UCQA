@@ -378,11 +378,11 @@ class usercontrol extends base {
 		$uid = $this->input('uid');
 		if(empty($uid)) {
 			//return -1;
-			capi_showmessage_by_data('ucenter_error',-1);
+			capi_showmessage_by_data('ucenter_error',-1,array('error'=>'uid is empty'));
 		}
 		if(empty($_FILES['Filedata'])) {
 			//return -3;
-			capi_showmessage_by_data('ucenter_error',-3);
+			capi_showmessage_by_data('ucenter_error',-3,array('error'=>'Filedata is empty'));
 		}
 		
 		list($width, $height, $type, $attr) = getimagesize($_FILES['Filedata']['tmp_name']);

@@ -526,10 +526,11 @@ if(capi_submitcheck('commentsubmit')) {
 		}
 	}
 	
-	$pushmessage=$setarr['author'].' 回复了你: '. $setarr['message'];
-	capi_jpush($setarr['uid'], $pushmessage, null, array("commentid"=>$cid,'uid'=>$setarr['uid'],'id'=>$setarr['id'],'idtype'=>$setarr['idtype']));
-
-	capi_showmessage_by_data($msg ,0,array("commentid"=>$cid, "refer"=> $_POST['refer']));
+	if($_SGLOBAL['supe_uid']!=$setarr['uid']){
+		$pushmessage=$setarr['author'].' 回复了你: '. $setarr['message'];
+		capi_jpush($setarr['uid'], $pushmessage, null, array("commentid"=>$cid,'uid'=>$setarr['uid'],'id'=>$setarr['id'],'idtype'=>$setarr['idtype']));
+	}
+	capi_showmessage_by_data($msg ,0,array("commentid"=>$cid));
 }
 
 $cid = empty($_GET['cid'])?0:intval($_GET['cid']);
