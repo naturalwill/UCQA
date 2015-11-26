@@ -1002,7 +1002,7 @@ function uc_mail_queue($uids, $emails, $subject, $message, $frommail = '', $char
  */
 function uc_check_avatar($uid, $size = 'middle', $type = 'virtual') {
 	$url = UC_API."/avatar.php?uid=$uid&size=$size&type=$type&check_file_exists=1";
-	$res = uc_fopen2($url, 500000, '', '', TRUE, UC_IP, 20);
+	$res = curl_fopen($url, 500000, '', '', TRUE, UC_IP, 20);
 	if($res == 1) {
 		return 1;
 	} else {
