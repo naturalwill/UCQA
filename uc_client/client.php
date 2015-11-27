@@ -271,7 +271,14 @@ function uc_fopen2($url, $limit = 0, $post = '', $cookie = '', $bysocket = FALSE
 		return '';
 	}
 	$url .= (strpos($url, '?') === FALSE ? '?' : '&')."__times__=$__times__";
-	return uc_fopen($url, $limit, $post, $cookie, $bysocket, $ip, $timeout, $block);
+	
+	$postnew=array();
+	$postarr=explode('&',$post);
+	foreach($postarr as $value){
+		$var=explode('=' ,$value);
+		$postnew[$var[0]]=urldecode($var[1]);
+	}
+	return curl_fopen($url, $limit, $postnew, $cookie, $bysocket, $ip, $timeout, $block);
 }
 
 function uc_fopen($url, $limit = 0, $post = '', $cookie = '', $bysocket = FALSE, $ip = '', $timeout = 15, $block = TRUE) {
