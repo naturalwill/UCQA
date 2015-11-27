@@ -148,7 +148,8 @@ function bwzt_post($POST, $olds=array()) {
 		'age' => $POST['age'],
 		'friend' => $POST['friend'],
 		'password' => $POST['password'],
-		'noreply' => empty($_POST['noreply'])?0:1
+		'noreply' => empty($_POST['noreply'])?0:1,
+		'status' => empty($_POST['status'])?0:1
 	);
 
 	//±ÍÃ‚Õº∆¨
