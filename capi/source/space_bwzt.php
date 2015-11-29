@@ -158,7 +158,7 @@ if($id) {
 		$cid = empty($_GET['cid'])?0:intval($_GET['cid']);
 		$csql = $cid?"cid='$cid' AND":'';
 
-		$query = $_SGLOBAL['db']->query("SELECT c.*,s.name FROM ".tname('comment')." c LEFT JOIN ".tname('space')." s ON c.uid=s.uid WHERE $csql id='$id' AND idtype='bwztid' ORDER BY dateline LIMIT $start,$perpage");
+		$query = $_SGLOBAL['db']->query("SELECT c.*,s.name FROM ".tname('comment')." c LEFT JOIN ".tname('space')." s ON c.authorid=s.uid WHERE $csql id='$id' AND idtype='bwztid' ORDER BY dateline LIMIT $start,$perpage");
 		
 		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
 			realname_set($value['authorid'], $value['author']);//实名
