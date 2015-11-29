@@ -95,7 +95,7 @@ if(capi_submitcheck('loginsubmit')) {
 	
 	include_once(S_ROOT.'./source/function_space.php');
 	//开通空间
-	$query = $_SGLOBAL['db']->query("SELECT s.*, sf.* FROM ".tname('space')." s LEFT JOIN ".tname('spacefield')." sf ON sf.uid=s.uid WHERE uid='$setarr[uid]'");
+	$query = $_SGLOBAL['db']->query("SELECT s.*, sf.* FROM ".tname('space')." s LEFT JOIN ".tname('spacefield')." sf ON sf.uid=s.uid WHERE s.uid='$setarr[uid]'");
 	if(!$space = $_SGLOBAL['db']->fetch_array($query)) {
 		$space = space_open($setarr['uid'], $setarr['username'], 0, $passport['email']);
 	}
