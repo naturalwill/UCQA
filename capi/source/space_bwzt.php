@@ -22,7 +22,7 @@ $clicks = empty($_SGLOBAL['click']['bwztid'])?array():$_SGLOBAL['click']['bwztid
 
 if($id) {
 	//读取日志
-	$query = $_SGLOBAL['db']->query("SELECT bf.*, b.* FROM ".tname('bwzt')." b LEFT JOIN ".tname('bwztfield')." bf ON bf.bwztid=b.bwztid WHERE b.bwztid='$id' AND b.uid='$space[uid]'");
+	$query = $_SGLOBAL['db']->query("SELECT bf.*, b.*, s.name FROM ".tname('bwzt')." b LEFT JOIN ".tname('space')." s ON s.uid=b.uid LEFT JOIN ".tname('bwztfield')." bf ON bf.bwztid=b.bwztid WHERE b.bwztid='$id' AND b.uid='$space[uid]'");
 	$bwzt = $_SGLOBAL['db']->fetch_array($query);
 	//日志不存在
 	if(empty($bwzt)) {
@@ -31,7 +31,8 @@ if($id) {
 	//检查好友权限
 	if(!ckfriend($bwzt['uid'], $bwzt['friend'], $bwzt['target_ids'])) {
 		//没有权限
-		include template('space_privacy');
+		//include template('space_privacy');
+		capi_showmessage_by_data('space_privacy');
 		exit();
 	} elseif(!$space['self'] && $bwzt['friend'] == 4) {
 		//密码输入问题
@@ -39,7 +40,8 @@ if($id) {
 		$cookievalue = empty($_SCOOKIE[$cookiename])?'':$_SCOOKIE[$cookiename];
 		if($cookievalue != md5(md5($bwzt['password']))) {
 			$invalue = $bwzt;
-			include template('do_inputpwd');
+			//include template('do_inputpwd');
+			capi_showmessage_by_data('do_inputpwd');
 			exit();
 		}
 	}
@@ -156,9 +158,11 @@ if($id) {
 		$cid = empty($_GET['cid'])?0:intval($_GET['cid']);
 		$csql = $cid?"cid='$cid' AND":'';
 
-		$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('comment')." WHERE $csql id='$id' AND idtype='bwztid' ORDER BY dateline LIMIT $start,$perpage");
+		$query = $_SGLOBAL['db']->query("SELECT c.*,s.name FROM ".tname('comment')." c LEFT JOIN ".tname('space')." s ON c.uid=s.uid WHERE $csql id='$id' AND idtype='bwztid' ORDER BY dateline LIMIT $start,$perpage");
+		
 		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
 			realname_set($value['authorid'], $value['author']);//实名
+			$value['message']=strip_tags($value['message']); //剥去字符串中的 HTML 标签
 			$list[] = $value;
 		}
 	}
@@ -209,8 +213,9 @@ if($id) {
 	$commenttip=array("commentsubmit"=>true,"formhash"=>formhash(),"id"=>$bwzt[bwztid],"idtype"=>"bwztid","message"=>"","refer"=>"");
 	$bwzt["replylist"]=$list;
 	$bwzt["comment"]=$commenttip;
+	
 	//增加发布者头像地址
-	$bwzt['avatar_url'] = avatar($bwzt['uid'],'small',TRUE);
+	$bwzt['avatar_url'] = avatar($bwzt['uid'],'middle',TRUE);
 	$bwzt['message']=strip_tags($bwzt['message']); //剥去字符串中的 HTML 标签
 	capi_showmessage_by_data("do_success",0, array('bwzt'=>$bwzt));
 } else {
@@ -263,7 +268,8 @@ if($id) {
 				WHERE c.uid='$space[uid]' AND c.idtype='bwztid' $wheresql
 				ORDER BY c.dateline DESC LIMIT $start,$perpage");
 		}
-	} else {
+	} 
+	else {
 		
 		//症状分类
 		$query = $_SGLOBAL['db']->query("SELECT bwztclassid, bwztclassname FROM ".tname('bwztclass'));
@@ -396,7 +402,8 @@ if($id) {
 			updatetable('space', array('bwztnum' => $count), array('uid'=>$space['uid']));
 		}
 		if($count) {
-			$query = $_SGLOBAL['db']->query("SELECT bf.message, bf.target_ids, bf.magiccolor, b.* FROM ".tname('bwzt')." b $f_index
+			$query = $_SGLOBAL['db']->query("SELECT bf.message, bf.target_ids, bf.magiccolor, b.*, s.name FROM ".tname('bwzt')." b $f_index
+				LEFT JOIN ".tname('space')." s ON s.uid=b.uid
 				LEFT JOIN ".tname('bwztfield')." bf ON bf.bwztid=b.bwztid
 				WHERE $wheresql
 				ORDER BY $ordersql DESC LIMIT $start,$perpage");
@@ -417,7 +424,7 @@ if($id) {
 				$value['pics']=json_decode($value['pics']);//json解密picurls
 				
 				//增加发布者头像地址
-				$value['avatar_url'] = avatar($value['uid'],'small',TRUE);
+				$value['avatar_url'] = avatar($value['uid'],'middle',TRUE);
 				$list[] = $value;
 			} else {
 				$pricount++;

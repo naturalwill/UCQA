@@ -16,13 +16,13 @@ if($_SGLOBAL['supe_uid']) {
 		$auth = authcode("$member[password]\t$member[uid]", 'ENCODE');
 		$space = getspace($_SGLOBAL['supe_uid']);
 		
-		//增加用户头像地址
-		$space['avatar_url'] =$space['avatar']? avatar($space['uid'],'small',TRUE) : avatar_default();
 		//性别
 		$space['sex_org'] = $space['sex'];
 		$space['sex'] = $space['sex']=='1'?lang('man'):($space['sex']=='2'?lang('woman'):'');
 		//年龄
 		$space['age'] = ($space['birthyear']&&$space['birthmonth']&&$space['birthday'])?intval((time() - strtotime($space['birthyear'].'/'.$space['birthmonth'].'/'.$space['birthday']))/365/24/3600):'';
+		//增加用户头像地址
+		$space['avatar_url'] =$space['avatar']? avatar($space['uid'],'middle',TRUE) : avatar_default();
 		capi_showmessage_by_data('do_success', 0, array("m_auth"=>rawurlencode($auth), 'uhash'=> $_SGLOBAL['uhash']/* 用于注销 */, "formhash"=>formhash(), "space"=>$space));
 	}
 	capi_showmessage_by_data('login_failure_please_re_login');
@@ -95,10 +95,16 @@ if(capi_submitcheck('loginsubmit')) {
 	
 	include_once(S_ROOT.'./source/function_space.php');
 	//开通空间
-	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('space')." WHERE uid='$setarr[uid]'");
+	$query = $_SGLOBAL['db']->query("SELECT s.*, sf.* FROM ".tname('space')." s LEFT JOIN ".tname('spacefield')." sf ON sf.uid=s.uid WHERE uid='$setarr[uid]'");
 	if(!$space = $_SGLOBAL['db']->fetch_array($query)) {
 		$space = space_open($setarr['uid'], $setarr['username'], 0, $passport['email']);
 	}
+	//性别
+	$space['sex_org'] = $space['sex'];
+	$space['sex'] = $space['sex']=='1'?lang('man'):($space['sex']=='2'?lang('woman'):'');
+	//年龄
+	$space['age'] = ($space['birthyear']&&$space['birthmonth']&&$space['birthday'])?intval((time() - strtotime($space['birthyear'].'/'.$space['birthmonth'].'/'.$space['birthday']))/365/24/3600):'';
+
 	
 	$_SGLOBAL['member'] = $space;
 	
@@ -172,16 +178,8 @@ if(capi_submitcheck('loginsubmit')) {
 	realname_get();
 
 	//增加用户头像地址
-	$space['avatar_url'] =$space['avatar']? avatar($space['uid'],'small',TRUE):avatar_default();
-	//增加性别年龄
-	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('spacefield')." WHERE uid='$space[uid]'");
-	if($spacefield = $_SGLOBAL['db']->fetch_array($query)){
-		//性别
-		$space['sex_org'] = $spacefield['sex'];
-		$space['sex'] = $spacefield['sex']=='1'?lang('man'):($spacefield['sex']=='2'?lang('woman'):'');
-		//年龄
-		$space['age'] = ($spacefield['birthyear']&&$spacefield['birthmonth']&&$spacefield['birthday'])?intval((time() - strtotime($spacefield['birthyear'].'/'.$spacefield['birthmonth'].'/'.$spacefield['birthday']))/365/24/3600):'';
-	}
+	$space['avatar_url'] =$space['avatar']? avatar($space['uid'],'middle',TRUE):avatar_default();
+	
 	capi_showmessage_by_data('login_success',  0, array("m_auth"=>rawurlencode($auth), 'uhash'=> $_SGLOBAL['uhash']/* 用于注销 */, "formhash"=>formhash(), "space"=>$space));
 }
 
