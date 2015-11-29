@@ -526,8 +526,9 @@ if(capi_submitcheck('commentsubmit')) {
 		}
 	}
 	
-	if($_SGLOBAL['supe_uid']!=$setarr['uid']){
-		$pushmessage=$setarr['author'].' 回复了你: '. $setarr['message'];
+	if($space['uid']!=$tospace['uid']){
+		$tospace['name']=empty($tospace['name'])?$tospace['username']:$tospace['name'];
+		$pushmessage=$tospace['name'].' 回复了你: '. $setarr['message'];
 		capi_jpush($setarr['uid'], $pushmessage, null, array("commentid"=>$cid,'uid'=>$setarr['uid'],'id'=>$setarr['id'],'idtype'=>$setarr['idtype']));
 	}
 	capi_showmessage_by_data($msg ,0,array("commentid"=>$cid));
