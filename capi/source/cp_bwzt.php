@@ -65,7 +65,7 @@ if(capi_submitcheck('bwztsubmit')) {
 	}
 	
 	//ÑéÖ¤Âë
-	if(checkperm('seccode') && !ckseccode($_POST['seccode'])) {
+	if(checkperm('seccode') && !ckseccode($_REQUEST['seccode'])) {
 		capi_showmessage_by_data('incorrect_code');
 	}
 	
