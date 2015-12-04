@@ -70,6 +70,13 @@ if(capi_submitcheck('bwztsubmit')) {
 	}
 	
 	include_once(S_ROOT.'./source/function_bwzt.php');
+	if($op=='alterstatus'){
+		if($newbwztstatus = bwzt_alterstatus($_GET['status'], $bwzt)) {
+			capi_showmessage_by_data('do_success', 0, $newbwztstatus);
+		} else {
+			capi_showmessage_by_data('alter_status_failed');
+		}
+	}
 	if($newbwzt = bwzt_post($_POST, $bwzt)) {
 		if(empty($bwzt) && $newbwzt['topicid']) {
 			$url = 'space.php?do=topic&topicid='.$newbwzt['topicid'].'&view=bwzt';

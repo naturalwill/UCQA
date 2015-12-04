@@ -8,7 +8,7 @@ if(!defined('IN_UCHOME')) {
 	exit('Access Denied');
 }
 
-//添加博客
+//添加咨询
 function bwzt_post($POST, $olds=array()) {
 	global $_SGLOBAL, $_SC, $space;
 	
@@ -148,8 +148,8 @@ function bwzt_post($POST, $olds=array()) {
 		'age' => $POST['age'],
 		'friend' => $POST['friend'],
 		'password' => $POST['password'],
-		'noreply' => empty($_POST['noreply'])?0:1,
-		'status' => empty($_POST['status'])?0:1
+		'noreply' => empty($_POST['noreply'])?0:1//,
+		//'status' => empty($_POST['status'])?0:1
 	);
 
 	//标题图片
@@ -294,6 +294,63 @@ function bwzt_post($POST, $olds=array()) {
 	//热闹
 	if(empty($olds) && $bwztarr['topicid']) {
 		topic_join($bwztarr['topicid'], $_SGLOBAL['supe_uid'], $_SGLOBAL['supe_username']);
+	}
+
+	//角色切换
+	if(!empty($__SGLOBAL)) $_SGLOBAL = $__SGLOBAL;
+
+	return $bwztarr;
+}
+
+//更改咨询状态
+function bwzt_alterstatus($status, $olds=array()) {
+	global $_SGLOBAL, $_SC, $space;
+	
+	//操作者角色切换
+	$isself = 1;
+	if(!empty($olds['uid']) && $olds['uid'] != $_SGLOBAL['supe_uid']) {
+		$isself = 0;
+		$__SGLOBAL = $_SGLOBAL;
+		$_SGLOBAL['supe_uid'] = $olds['uid'];
+		$_SGLOBAL['supe_username'] = addslashes($olds['username']);
+	}
+	
+	//主表
+	$bwztarr = array('status' => empty($status)?0:1);
+	
+	if($olds['bwztid']) {
+		//更新
+		$bwztid = $olds['bwztid'];
+		updatetable('bwzt', $bwztarr, array('bwztid'=>$bwztid));
+		
+		$fuids = array();
+		
+		$bwztarr['uid'] = $olds['uid'];
+		$bwztarr['username'] = $olds['username'];
+	}
+	
+	$bwztarr['bwztid'] = $bwztid;
+	
+
+	//空间更新
+	if($isself) {
+		if($olds) {
+			//空间更新
+			$_SGLOBAL['db']->query("UPDATE ".tname('space')." SET updatetime='$_SGLOBAL[timestamp]' WHERE uid='$_SGLOBAL[supe_uid]'");
+		} else {
+			if(empty($space['bwztnum'])) {
+				$space['bwztnum'] = getcount('bwzt', array('uid'=>$space['uid']));
+				$bwztnumsql = "bwztnum=".$space['bwztnum'];
+			} else {
+				$bwztnumsql = 'bwztnum=bwztnum+1';
+			}
+			//积分
+			$reward = getreward('publishbwzt', 0);
+			$_SGLOBAL['db']->query("UPDATE ".tname('space')." SET {$bwztnumsql}, lastpost='$_SGLOBAL[timestamp]', updatetime='$_SGLOBAL[timestamp]', credit=credit+$reward[credit], experience=experience+$reward[experience] WHERE uid='$_SGLOBAL[supe_uid]'");
+			
+			//统计
+			updatestat('bwzt');
+		}
 	}
 
 	//角色切换
