@@ -529,7 +529,15 @@ if(capi_submitcheck('commentsubmit')) {
 	if($space['uid']!=$tospace['uid']){
 		$tospace['name']=empty($tospace['name'])?$tospace['username']:$tospace['name'];
 		$pushmessage=$tospace['name'].' 回复了你: '. $setarr['message'];
-		capi_jpush($setarr['uid'], $pushmessage, null, array("commentid"=>$cid,'uid'=>$setarr['uid'],'id'=>$setarr['id'],'idtype'=>$setarr['idtype']));
+		$extras=array(
+			"commentid"=>$cid,
+			'uid'=>$setarr['uid'],
+			'name'=>$tospace['name'],
+			'subject'=>$space['subject'],
+			'id'=>$setarr['id'],
+			'idtype'=>$setarr['idtype']
+		);
+		capi_jpush($setarr['uid'], $pushmessage, null, $extras);
 	}
 	capi_showmessage_by_data($msg ,0,array("commentid"=>$cid));
 }

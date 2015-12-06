@@ -33,7 +33,7 @@ function capi_jpush($uid,$message,$title=null,$extras=null){
 			->setAudience(M\Audience(M\alias(array(strval($uid)))))
 			->setNotification(M\notification($message,
 				M\android($message, $title, null, $extras),
-				M\ios($message, null, "+1", true, $extras))
+				M\ios($message, JPUSH_IOS_SOUND, "+1", true, $extras))
 			)
 			->printJSON()
 			->send();		
