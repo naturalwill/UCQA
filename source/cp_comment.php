@@ -526,18 +526,28 @@ if(submitcheck('commentsubmit')) {
 		}
 	}
 	
-	if($space['uid']!=$tospace['uid']){
+	
+	if($bwzt){
+		$query = $_SGLOBAL['db']->query("SELECT distinct authorid FROM ".tname('comment')." WHERE id='{$bwzt['id']}' AND idtype='bwztid' ORDER BY dateline ");
+		$uidarr=array();
+		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
+			if($value['authorid']==$space['uid']) continue;
+			$uidarr[] = strval($value['authorid']);
+		}
+		if(!in_array($tospace['uid'], $uidarr)) $uidarr[] = strval($tospace['uid']);
+		
 		$tospace['name']=empty($tospace['name'])?$tospace['username']:$tospace['name'];
-		$pushmessage=$tospace['name'].' 回复了你: '. $setarr['message'];
+		$pushmessage=$space['name'].' 评论了 '.$bwzt['subject'].': '. $setarr['message'];
 		$extras=array(
 			"commentid"=>$cid,
 			'uid'=>$setarr['uid'],
 			'name'=>$tospace['name'],
-			'subject'=>$space['subject'],
+			'subject'=>$bwzt['subject'],
 			'id'=>$setarr['id'],
 			'idtype'=>$setarr['idtype']
 		);
-		capi_jpush($setarr['uid'], $pushmessage, null, $extras);
+		capi_jpush($uidarr, $pushmessage, null, $extras);
+
 	}
 
 	showmessage($msg, $_POST['refer'], 0, $magvalues);

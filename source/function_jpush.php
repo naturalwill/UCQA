@@ -17,7 +17,7 @@
 	use JPush\Exception\APIRequestException;
 
 //$extras is array, title and message is string
-function capi_jpush($uid,$message,$title=null,$extras=null){
+function capi_jpush($uidarr,$message,$title=null,$extras=null){
 	//$br = '<br/>';
 	//$spilt = ' - ';
 
@@ -30,7 +30,7 @@ function capi_jpush($uid,$message,$title=null,$extras=null){
 		// easy push with ios badge +1
 		$result = $client->push()
 			->setPlatform(M\Platform('android', 'ios'))
-			->setAudience(M\Audience(M\alias(array(strval($uid)))))
+			->setAudience(M\Audience(M\alias($uidarr)))
 			->setNotification(M\notification($message,
 				M\android($message, $title, null, $extras),
 				M\ios($message, JPUSH_IOS_SOUND, "+1", true, $extras))
