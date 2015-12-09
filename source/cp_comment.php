@@ -528,11 +528,11 @@ if(submitcheck('commentsubmit')) {
 	
 	
 	if($bwzt){
-		$query = $_SGLOBAL['db']->query("SELECT distinct authorid FROM ".tname('comment')." WHERE id='{$bwzt['id']}' AND idtype='bwztid' ORDER BY dateline ");
+		$query = $_SGLOBAL['db']->query("SELECT distinct authorid FROM ".tname('comment')." WHERE id='{$bwzt['bwztid']}' AND idtype='bwztid' ORDER BY dateline ");
 		$uidarr=array();
 		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
-			if($value['authorid']==$space['uid']) continue;
-			$uidarr[] = strval($value['authorid']);
+			if($value['authorid']!=$space['uid'])
+				$uidarr[] = strval($value['authorid']);
 		}
 		if(!in_array($tospace['uid'], $uidarr)) $uidarr[] = strval($tospace['uid']);
 		
