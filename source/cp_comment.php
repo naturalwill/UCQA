@@ -537,6 +537,8 @@ if(submitcheck('commentsubmit')) {
 		if(!in_array($tospace['uid'], $uidarr)) $uidarr[] = strval($tospace['uid']);
 		
 		$tospace['name']=empty($tospace['name'])?$tospace['username']:$tospace['name'];
+		$space['name']=empty($space['name'])?$space['username']:$space['name'];
+		
 		$pushmessage=$space['name'].' 评论了 '.$bwzt['subject'].': '. $setarr['message'];
 		$extras=array(
 			"commentid"=>$cid,
