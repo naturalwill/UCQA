@@ -32,7 +32,8 @@ if($view == 'userapp') {
 		$appid = intval($_GET['appid']);
 		$_SGLOBAL['db']->query("DELETE FROM ".tname('myinvite')." WHERE appid='$appid' AND touid='$_SGLOBAL[supe_uid]'");
 		
-		showmessage('do_success', "space.php?do=notice&view=userapp", 0);
+		//showmessage('do_success', "space.php?do=notice&view=userapp", 0);
+		capi_showmessage_by_data('do_success', 0);
 	}
 	
 	$start = empty($_GET['start'])?0:intval($_GET['start']);
@@ -95,7 +96,9 @@ if($view == 'userapp') {
 		'eventmemberstatus' => lang('event_memberstatus'),
 		'poll' => lang('poll'),
 		'pollcomment' => lang('poll_comment'),
-		'pollinvite' => lang('poll_invite')
+		'pollinvite' => lang('poll_invite'),
+		'clickbwzt' => lang('clickbwzt'),
+		'bwztcomment' => lang('bwzt_comment')
 	);
 	
 	$type = trim($_GET['type']);
@@ -104,7 +107,9 @@ if($view == 'userapp') {
 	$newids = array();
 	$count = $_SGLOBAL['db']->result($_SGLOBAL['db']->query("SELECT COUNT(*) FROM ".tname('notification')." WHERE uid='$_SGLOBAL[supe_uid]' $typesql"), 0);
 	if($count) {
-		$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('notification')." WHERE uid='$_SGLOBAL[supe_uid]' $typesql ORDER BY dateline DESC LIMIT $start,$perpage");
+		//$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('notification')." WHERE uid='$_SGLOBAL[supe_uid]' $typesql ORDER BY dateline DESC LIMIT $start,$perpage");
+		$query = $_SGLOBAL['db']->query("SELECT c.message,s.name,n.* FROM ".tname('notification')." n LEFT JOIN ".tname('comment')." c ON c.cid=n.id LEFT JOIN ".tname('space')." s ON s.uid=n.authorid WHERE n.uid='$_SGLOBAL[supe_uid]' $typesql ORDER BY n.dateline DESC LIMIT $start,$perpage");
+		
 		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
 			if($value['authorid']) {
 				realname_set($value['authorid'], $value['author']);
@@ -120,6 +125,11 @@ if($view == 'userapp') {
 			} else {
 				$value['style'] = '';
 			}
+			
+			preg_match_all('/<a\s+href[^\"]+\"([^\"]+)\"[^>]*>.*<\/a>/i', $value['note'], $matches);
+			$value['link']=$matches[1][0];
+			$value['note']=strip_tags($value['note']);
+			$value['name']=empty($value['name'])?$value['author']:$value['name'];
 			$list[] = $value;
 		}
 		//·ÖÒ³
@@ -148,6 +158,8 @@ if($view == 'userapp') {
 	
 	realname_get();
 }
-include_once template("space_notice");
-
+//include_once template("space_notice");
+$realpages = @ceil($count / $perpage);
+$notices=array('pages'=>$realpages,'count'=>count($list),'list'=>$list);
+capi_showmessage_by_data('do_success',0,array('notices'=>$notices));
 ?>
