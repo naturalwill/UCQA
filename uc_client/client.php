@@ -166,13 +166,74 @@ function uc_authcode($string, $operation = 'DECODE', $key = '', $expiry = 0) {
 	}
 }
 
+/**
+ *  支持https的访问
+ */
+function curl_fopen($url, $limit = 0, $post = array(), $cookie = '', $bysocket = FALSE, $ip = '', $timeout = 20, $block = TRUE) {
+	$__times__ = isset($_GET['__times__']) ? intval($_GET['__times__']) + 1 : 1;
+	if($__times__ > 2) {
+		return '';
+	}
+	$url .= (strpos($url, '?') === FALSE ? '?' : '&')."__times__=$__times__";
+	
+	$return = '';
+	$matches = parse_url($url);
+	if (isset ( $matches ['host'] ) && isset ( $matches ['scheme'] )) {
+		$return = curlPost($url, $post, $timeout);
+	}
+	return $return;
+}
+
+function curlPost($url, $data=array(), $timeout = 30)
+{
+    $ssl = substr($url, 0, 5) == "https" ? TRUE : FALSE;
+    $ch = curl_init();
+    $opt = array(
+            CURLOPT_URL     => $url,
+            CURLOPT_HEADER  => 0,
+            CURLOPT_RETURNTRANSFER  => 1,
+            CURLOPT_TIMEOUT         => $timeout,
+            );
+	if(!empty($data)){
+		$opt[CURLOPT_POST ]       = 1;
+		$opt[CURLOPT_POSTFIELDS ] = $data;
+	}
+    if ($ssl)
+    {
+        //$opt[CURLOPT_SSL_VERIFYHOST] = 1;
+        $opt[CURLOPT_SSL_VERIFYPEER] = FALSE;
+    }
+    curl_setopt_array($ch, $opt);
+    $result = curl_exec($ch);
+    curl_close($ch);
+    return $result;
+}
+/**
+ *  远程打开URL
+ *  @param string $url		打开的url，　如 http://www.baidu.com/123.htm
+ *  @param int $limit		取返回的数据的长度
+ *  @param string $post		要发送的 POST 数据，如uid=1&password=1234
+ *  @param string $cookie	要模拟的 COOKIE 数据，如uid=123&auth=a2323sd2323
+ *  @param bool $bysocket	TRUE/FALSE 是否通过SOCKET打开
+ *  @param string $ip		IP地址
+ *  @param int $timeout		连接超时时间
+ *  @param bool $block		是否为阻塞模式
+ *  @return			取到的字符串
+ */
 function uc_fopen2($url, $limit = 0, $post = '', $cookie = '', $bysocket = FALSE, $ip = '', $timeout = 15, $block = TRUE) {
 	$__times__ = isset($_GET['__times__']) ? intval($_GET['__times__']) + 1 : 1;
 	if($__times__ > 2) {
 		return '';
 	}
 	$url .= (strpos($url, '?') === FALSE ? '?' : '&')."__times__=$__times__";
-	return uc_fopen($url, $limit, $post, $cookie, $bysocket, $ip, $timeout, $block);
+	
+	$postnew=array();
+	$postarr=explode('&',$post);
+	foreach($postarr as $value){
+		$var=explode('=' ,$value);
+		$postnew[$var[0]]=urldecode($var[1]);
+	}
+	return curl_fopen($url, $limit, $postnew, $cookie, $bysocket, $ip, $timeout, $block);
 }
 
 function uc_fopen($url, $limit = 0, $post = '', $cookie = '', $bysocket = FALSE, $ip = '', $timeout = 15, $block = TRUE) {
@@ -576,6 +637,28 @@ function uc_check_version() {
 	$return = uc_api_post('version', 'check', array());
 	$data = uc_unserialize($return);
 	return is_array($data) ? $data : $return;
+}
+
+
+/**
+ * 修改头像
+ *
+ * @param	int		$uid	用户ID
+ * @param	string	$type	头像类型 real OR virtual 默认为 virtual
+ * @return	string
+ */
+function capi_uc_avatar($uid, $type = 'virtual') {
+	$uid = intval($uid);
+	$uc_input = uc_api_input("uid=$uid");
+	$uc_avatarflash = UC_API.'/images/camera.swf?inajax=1&appid='.UC_APPID.'&input='.$uc_input.'&agent='.md5($_SERVER['HTTP_USER_AGENT']).'&ucapi='.urlencode(UC_API).'&avatartype='.$type;
+		return array(
+			'UC_API'=> UC_API,
+			'appid'=> UC_APPID,
+			'input'=> $uc_input,
+			'agent'=> md5($_SERVER['HTTP_USER_AGENT']),
+			'ucapi'=> urlencode(UC_API),
+			'avatartype'=> $type
+		);
 }
 
 ?>
