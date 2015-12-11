@@ -1,24 +1,14 @@
 <?php
 
 /*
-	[UCenter] (C)2001-2009 Comsenz Inc.
+	[UCenter] (C)2001-2099 Comsenz Inc.
 	This is NOT a freeware, use is subject to license terms
 
-	$Id: db.class.php 922 2009-02-19 01:30:22Z zhaoxiongfei $
+	$Id: db.class.php 1059 2011-03-01 07:25:09Z monkey $
 */
 
-/**
-	CREATE TABLE `sqlcache` (
-                `sqlid` char(6) NOT NULL default '',
-                `data` char(100) NOT NULL,
-                `expiry` int(10) unsigned NOT NULL,
-                PRIMARY KEY  (`sqlid`),
-                KEY(expiry)
-               ) Type=MyISAM
 
-*/
-
-class db {
+class ucclient_db {
 	var $querynum = 0;
 	var $link;
 	var $histories;
@@ -31,7 +21,7 @@ class db {
 	var $tablepre;
 	var $time;
 
-	var $goneaway = 5;//note 最多重试几次
+	var $goneaway = 5;
 
 	function connect($dbhost, $dbuser, $dbpw, $dbname = '', $dbcharset = '', $pconnect = 0, $tablepre='', $time = 0) {
 		$this->dbhost = $dbhost;

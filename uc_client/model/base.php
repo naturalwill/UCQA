@@ -1,10 +1,10 @@
 <?php
 
 /*
-	[UCenter] (C)2001-2009 Comsenz Inc.
+	[UCenter] (C)2001-2099 Comsenz Inc.
 	This is NOT a freeware, use is subject to license terms
 
-	$Id: base.php 837 2008-12-05 03:14:47Z zhaoxiongfei $
+	$Id: base.php 1059 2011-03-01 07:25:09Z monkey $
 */
 
 !defined('IN_UC') && exit('Access Denied');
@@ -36,10 +36,6 @@ class base {
 		$this->base();
 	}
 
-	/**
-	 * 初始化基类
-	 *
-	 */
 	function base() {
 		$this->init_var();
 		$this->init_db();
@@ -72,23 +68,12 @@ class base {
 
 	}
 
-	/**
-	 * 实例化数据库类
-	 *
-	 */
 	function init_db() {
 		require_once UC_ROOT.'lib/db.class.php';
-		$this->db = new db();
+		$this->db = new ucclient_db();
 		$this->db->connect(UC_DBHOST, UC_DBUSER, UC_DBPW, '', UC_DBCHARSET, UC_DBCONNECT, UC_DBTABLEPRE);
 	}
 
-	/**
-	 * 加载相应的 Model, 存入 $_ENV 超级全局变量
-	 *
-	 * @param string $model 模块名称
-	 * @param 该模块相对的基类 $base 默认为该基类
-	 * @return 此处不需要返回
-	 */
 	function load($model, $base = NULL) {
 		$base = $base ? $base : $this;
 		if(empty($_ENV[$model])) {
@@ -98,13 +83,6 @@ class base {
 		return $_ENV[$model];
 	}
 
-	/**
-	 * 日期格式化 默认为格式化到分钟
-	 *
-	 * @param int $time
-	 * @param int $type 	1：只显示时间 2：只显示日期 3：日期时间均显示
-	 * @return string
-	 */
 	function date($time, $type = 3) {
 		if(!$this->settings) {
 			$this->settings = $this->cache('settings');
@@ -114,35 +92,16 @@ class base {
 		return gmdate(implode(' ', $format), $time + $this->settings['timeoffset']);
 	}
 
-	/**
-	 * 对翻页的起始位置进行判断和调整
-	 *
-	 * @param int $page 页码
-	 * @param int $ppp 每页大小
-	 * @param int $totalnum 总纪录数
-	 * @return unknown
-	 */
 	function page_get_start($page, $ppp, $totalnum) {
 		$totalpage = ceil($totalnum / $ppp);
 		$page =  max(1, min($totalpage,intval($page)));
 		return ($page - 1) * $ppp;
 	}
 
-	/**
-	 * 对字符或者数组加逗号连接, 用来
-	 *
-	 * @param string/array $arr 可以传入数字或者字串
-	 * @return string 这样的格式: '1','2','3'
-	 */
 	function implode($arr) {
 		return "'".implode("','", (array)$arr)."'";
 	}
 
-	/**
-	 * 加载缓存文件, 如果不存在,则重新生成
-	 *
-	 * @param string $cachefile
-	 */
 	function &cache($cachefile) {
 		static $_CACHE = array();
 		if(!isset($_CACHE[$cachefile])) {
@@ -157,13 +116,6 @@ class base {
 		return $_CACHE[$cachefile];
 	}
 
-	/**
-	 * 得到设置的值
-	 *
-	 * @param string $k 设置的项
-	 * @param string $decode 是否进行反序列化，一般为数组时，需要指定为TRUE
-	 * @return string/array 设置的值
-	 */
 	function get_setting($k = array(), $decode = FALSE) {
 		$return = array();
 		$sqladd = $k ? "WHERE k IN (".$this->implode($k).")" : '';
@@ -177,7 +129,6 @@ class base {
 	}
 
 	function init_cache() {
-		//note 全局设置
 		$this->settings = $this->cache('settings');
 		$this->cache['apps'] = $this->cache('apps');
 
