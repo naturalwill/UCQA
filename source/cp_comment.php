@@ -547,7 +547,8 @@ if(submitcheck('commentsubmit')) {
 			'subject'=>$bwzt['subject'],
 			'id'=>$setarr['id'],
 			'idtype'=>$setarr['idtype']
-		);
+		);		
+		include_once(S_ROOT.'./source/function_jpush.php');
 		capi_jpush($uidarr, $pushmessage, null, $extras);
 
 	}

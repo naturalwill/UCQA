@@ -15,8 +15,44 @@ if(!empty($get_avatar)&&!empty($avatar_size)){
 	capi_showmessage_by_data('do_success', 0, array('avatar_url'=>avatar($space['uid'],$avatar_size,TRUE)));
 }
 
-if(submitcheck('avatarsubmit')) {
-	showmessage('do_success', 'cp.php?ac=avatar', 0);
+if(capi_submitcheck('avatarsubmit')) {
+	
+	if(empty($_FILES['Filedata']))
+		capi_showmessage_by_data('upload_error');
+	
+	$filepath=realpath($_FILES['Filedata']['tmp_name']);
+	if($filepath){
+		
+		include_once S_ROOT.'./uc_client/client.php';
+		$uc_avatar_url = capi_uc_avatar($_SGLOBAL['supe_uid'], (empty($_SCONFIG['avatarreal'])?'virtual':'real'), 1);
+		$data=array(
+			'Filedata'=>'@'.$filepath.";type=".$_FILES['Filedata']['type'].";filename=".$_FILES['Filedata']['name']
+		);
+		$curl=my_curl($uc_avatar_url, $data);
+		//capi_runlog('curl',$curl);
+		$result=@json_decode($curl);
+		
+		if($result->code==0){
+			/*
+			$curl_cookie=$separate='';
+			foreach($_COOKIE as $key => $val) {
+				$curl_cookie.=$separate.$key.'='.$val;
+				$separate=';';
+			}
+			*/
+			$url=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].':'.$_SERVER['SERVER_PORT'].$_SERVER['SCRIPT_NAME'];
+			$url.='?ac=avatar&m_auth='.rawurlencode($_GET['m_auth']);
+			
+			$curl=my_curl($url);
+			//capi_runlog('curl',$curl);
+			$result=@json_decode($curl);
+			
+			if($result->code==0){
+				capi_showmessage_by_data('do_success', 0, array('avatar_url'=>avatar($space['uid'],'middle',TRUE)));
+			}
+		}
+	}
+	capi_showmessage_by_data('non_normal_operation');
 }
 
 //Í·Ïñ

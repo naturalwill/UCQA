@@ -211,6 +211,7 @@ $_SGLOBAL['msglang'] = array(
 
 	//source/cp_upload.php
 	'upload_images_completed' => '上传图片完成了',
+	'upload_error' => '上传出错',
 
 	//source/cp_thread.php
 	'to_login' => '您需要先登录才能继续本操作',

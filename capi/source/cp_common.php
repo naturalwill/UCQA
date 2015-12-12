@@ -33,7 +33,7 @@ if($op == 'logout') {
 		ssetcookie('_refer', '');
 		capi_showmessage_by_data('security_exit', 0,  $show);
 	}
-	capi_showmessage_by_data('to_login');
+	capi_showmessage_by_data('non_normal_operation');
 
 } elseif($op == 'seccode') {
 

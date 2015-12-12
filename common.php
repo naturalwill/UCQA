@@ -24,7 +24,7 @@ if(!@include_once(S_ROOT.'./config.php')) {
 	exit();
 }
 include_once(S_ROOT.'./source/function_common.php');
-include_once(S_ROOT.'./source/function_jpush.php');
+include_once(S_ROOT.'./vendor/autoload.php');
 
 //Ê±¼ä
 $mtime = explode(' ', microtime());

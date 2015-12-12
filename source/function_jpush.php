@@ -1,20 +1,13 @@
 <?php
-/*
-	[UCenter Home] (C) 2007-2008 Comsenz Inc.
-	$Id: do.php 12354 2009-06-11 08:14:06Z liguode $
-*/
 
+use JPush\Model as M;
+use JPush\JPushClient;
+use JPush\JPushLog;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
-	include_once(S_ROOT.'./vendor/autoload.php');
-
-	use JPush\Model as M;
-	use JPush\JPushClient;
-	use JPush\JPushLog;
-	use Monolog\Logger;
-	use Monolog\Handler\StreamHandler;
-
-	use JPush\Exception\APIConnectionException;
-	use JPush\Exception\APIRequestException;
+use JPush\Exception\APIConnectionException;
+use JPush\Exception\APIRequestException;
 
 //$extras is array, title and message is string
 function capi_jpush($uidarr,$message,$title=null,$extras=null){

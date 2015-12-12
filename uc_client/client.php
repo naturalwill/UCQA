@@ -184,7 +184,7 @@ function curl_fopen($url, $limit = 0, $post = array(), $cookie = '', $bysocket =
 	return $return;
 }
 
-function curlPost($url, $data=array(), $timeout = 30)
+function curlPost($url, $data=array(), $timeout = 20)
 {
     $ssl = substr($url, 0, 5) == "https" ? TRUE : FALSE;
     $ch = curl_init();
@@ -647,18 +647,21 @@ function uc_check_version() {
  * @param	string	$type	头像类型 real OR virtual 默认为 virtual
  * @return	string
  */
-function capi_uc_avatar($uid, $type = 'virtual') {
+function capi_uc_avatar($uid, $type = 'virtual',$returnurl=0) {
 	$uid = intval($uid);
 	$uc_input = uc_api_input("uid=$uid");
-	$uc_avatarflash = UC_API.'/images/camera.swf?inajax=1&appid='.UC_APPID.'&input='.$uc_input.'&agent='.md5($_SERVER['HTTP_USER_AGENT']).'&ucapi='.urlencode(UC_API).'&avatartype='.$type;
-		return array(
-			'UC_API'=> UC_API,
-			'appid'=> UC_APPID,
-			'input'=> $uc_input,
-			'agent'=> md5($_SERVER['HTTP_USER_AGENT']),
-			'ucapi'=> urlencode(UC_API),
-			'avatartype'=> $type
-		);
+	if($returnurl){
+		$uc_avatar = UC_API.'/index.php?a=uploadavatar4m&m=user&inajax=1&appid='.UC_APPID.'&input='.$uc_input.'&agent='.md5($_SERVER['HTTP_USER_AGENT']).'&avatartype='.$type;
+		return $uc_avatar;
+	}
+	return array(
+		'UC_API'=> UC_API,
+		'appid'=> UC_APPID,
+		'input'=> $uc_input,
+		'agent'=> md5($_SERVER['HTTP_USER_AGENT']),
+		'ucapi'=> urlencode(UC_API),
+		'avatartype'=> $type
+	);
 }
 
 ?>

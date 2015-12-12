@@ -2180,4 +2180,33 @@ function ckspacelog() {
 	}
 }
 
+
+function my_curl($url, $data=array(),$cookie='', $timeout = 20)
+{
+    $ssl = substr($url, 0, 5) == "https" ? TRUE : FALSE;
+    $ch = curl_init();
+    $opt = array(
+            CURLOPT_URL     => $url,
+            CURLOPT_HEADER  => 0,
+            CURLOPT_RETURNTRANSFER  => 1,
+            CURLOPT_TIMEOUT         => $timeout,
+            );
+	if(!empty($data)){
+		$opt[CURLOPT_POST ]       = 1;
+		$opt[CURLOPT_POSTFIELDS ] = $data;
+	}
+	if(!empty($cookie)){
+		$opt[CURLOPT_COOKIE]      = $cookie;		
+	}
+    if ($ssl)
+    {
+        //$opt[CURLOPT_SSL_VERIFYHOST] = 1;
+        $opt[CURLOPT_SSL_VERIFYPEER] = FALSE;
+    }
+    curl_setopt_array($ch, $opt);
+    $result = curl_exec($ch);
+    curl_close($ch);
+    return $result;
+}
+
 ?>
