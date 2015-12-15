@@ -108,7 +108,7 @@ if($view == 'userapp') {
 	$count = $_SGLOBAL['db']->result($_SGLOBAL['db']->query("SELECT COUNT(*) FROM ".tname('notification')." WHERE uid='$_SGLOBAL[supe_uid]' $typesql"), 0);
 	if($count) {
 		//$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('notification')." WHERE uid='$_SGLOBAL[supe_uid]' $typesql ORDER BY dateline DESC LIMIT $start,$perpage");
-		$query = $_SGLOBAL['db']->query("SELECT c.message,s.name,n.* FROM ".tname('notification')." n LEFT JOIN ".tname('comment')." c ON c.cid=n.id LEFT JOIN ".tname('space')." s ON s.uid=n.authorid WHERE n.uid='$_SGLOBAL[supe_uid]' $typesql ORDER BY n.dateline DESC LIMIT $start,$perpage");
+		$query = $_SGLOBAL['db']->query("SELECT s.name,n.* FROM ".tname('notification')." n LEFT JOIN ".tname('space')." s ON s.uid=n.authorid WHERE n.uid='$_SGLOBAL[supe_uid]' $typesql ORDER BY n.dateline DESC LIMIT $start,$perpage");
 		
 		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
 			if($value['authorid']) {
@@ -126,10 +126,19 @@ if($view == 'userapp') {
 				$value['style'] = '';
 			}
 			
-			preg_match_all('/<a\s+href[^\"]+\"([^\"]+)\"[^>]*>.*<\/a>/i', $value['note'], $matches);
+			preg_match_all('/<a\s+href[^\"]+\"([^\"]+do\=(\w+)[^\"]+id\=(\d+)[^\"]+cid\=(\d+))\"[^>]*>.*<\/a>/i', $value['note'], $matches);
+			
 			$value['link']=$matches[1][0];
+			$n_do=$matches[2][0];
+			$n_do_id=$matches[3][0];
+			$n_cid=$matches[4][0];
+			$value['message'] = $_SGLOBAL['db']->result($_SGLOBAL['db']->query("SELECT message FROM ".tname('comment')." WHERE cid='$n_cid' "), 0);
+			$value['do']=$n_do;
+			$value[$n_do.'id']=$n_do_id;
 			$value['note']=strip_tags($value['note']);
 			$value['name']=empty($value['name'])?$value['author']:$value['name'];
+			$value['isnew']=$value['new'];
+			unset($value['new']);
 			$list[] = $value;
 		}
 		//·ÖÒ³
