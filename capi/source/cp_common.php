@@ -49,7 +49,7 @@ if($op == 'logout') {
 	$_GET['id'] = intval($_GET['id']);
 	$uidarr = $report = array();
 	
-	if(!in_array($_GET['idtype'], array('picid', 'blogid', 'albumid', 'tagid', 'tid', 'sid', 'uid', 'pid', 'eventid', 'comment', 'post')) || empty($_GET['id'])) {
+	if(!in_array($_GET['idtype'], array('picid', 'blogid', 'bwztid', 'albumid', 'tagid', 'tid', 'sid', 'uid', 'pid', 'eventid', 'comment', 'post')) || empty($_GET['id'])) {
 		capi_showmessage_by_data('report_error');
 	}
 	//获取举报记录
@@ -61,7 +61,7 @@ if($op == 'logout') {
 		}
 	}
 
-	if(submitcheck('reportsubmit')) {
+	if(capi_submitcheck('reportsubmit')) {
 		$reason = getstr($_POST['reason'], 150, 1, 1);
 
 		$reason = "<li><strong><a href=\"space.php?uid=$space[uid]\" target=\"_blank\">$_SGLOBAL[supe_username]</a>:</strong> ".$reason.' ('.sgmdate('m-d H:i').')</li>';
@@ -85,7 +85,7 @@ if($op == 'logout') {
 			);
 			inserttable('report', $setarr);
 		}
-		capi_showmessage_by_data('report_success');
+		capi_showmessage_by_data('report_success',0);
 	}
 
 	//判断是否是被忽略的举报
