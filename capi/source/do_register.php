@@ -83,7 +83,7 @@ if(empty($op)) {
 		
 		$username = trim($_REQUEST['username']);
 		$password = $_REQUEST['password'];
-		$_REQUEST['email'] = "$username@ucaq.cn";
+		$_REQUEST['email'] = "$username@dawnlightning.com";
 		
 		$email = isemail($_REQUEST['email'])?$_REQUEST['email']:'';
 		if(empty($email)) {
