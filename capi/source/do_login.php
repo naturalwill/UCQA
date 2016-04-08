@@ -179,7 +179,12 @@ if(capi_submitcheck('loginsubmit')) {
 
 	//增加用户头像地址
 	$space['avatar_url'] =$space['avatar']? avatar($space['uid'],'middle',TRUE):avatar_default();
-	
+
+	//通知数
+	$space['allnotenum'] = 0;
+	foreach (array('notenum','pokenum','addfriendnum','mtaginvitenum','eventinvitenum','myinvitenum') as $value) {
+		$space['allnotenum'] = $space['allnotenum'] + $space[$value];
+	}
 	capi_showmessage_by_data('login_success',  0, array("m_auth"=>rawurlencode($auth), 'uhash'=> $_SGLOBAL['uhash']/* 用于注销 */, "formhash"=>formhash(), "space"=>$space));
 }
 
