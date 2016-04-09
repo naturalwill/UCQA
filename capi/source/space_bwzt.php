@@ -1,8 +1,8 @@
 <?php
 /*
-	[UCenter Home] (C) 2007-2008 Comsenz Inc.
-	$Id: space_bwzt.php 13208 2009-08-20 06:31:35Z liguode $
-*/
+[UCenter Home] (C) 2007-2008 Comsenz Inc.
+$Id: space_bwzt.php 13208 2009-08-20 06:31:35Z liguode $
+ */
 
 if(!defined('IN_UCHOME')) {
 	exit('Access Denied');
@@ -48,7 +48,7 @@ if($id) {
 
 	//整理
 	$bwzt['tag'] = empty($bwzt['tag'])?array():unserialize($bwzt['tag']);
-	
+
 	//json解密picurls
 	$bwzt['pics']=json_decode($bwzt['pics']);
 
@@ -145,7 +145,7 @@ if($id) {
 	//评论
 	$perpage = 30;
 	$perpage = mob_perpage($perpage);
-	
+
 	$start = ($page-1)*$perpage;
 
 	//检查开始数
@@ -159,10 +159,11 @@ if($id) {
 		$csql = $cid?"cid='$cid' AND":'';
 
 		$query = $_SGLOBAL['db']->query("SELECT c.*,s.name FROM ".tname('comment')." c LEFT JOIN ".tname('space')." s ON c.authorid=s.uid WHERE $csql id='$id' AND idtype='bwztid' ORDER BY dateline LIMIT $start,$perpage");
-		
+
 		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
 			realname_set($value['authorid'], $value['author']);//实名
 			$value['message']=strip_tags($value['message']); //剥去字符串中的 HTML 标签
+            $value['avatar_url'] = avatar($value['authorid'],'middle',TRUE);
 			$list[] = $value;
 		}
 	}
@@ -213,7 +214,7 @@ if($id) {
 	$commenttip=array("commentsubmit"=>true,"formhash"=>formhash(),"id"=>$bwzt[bwztid],"idtype"=>"bwztid","message"=>"","refer"=>"");
 	$bwzt["replylist"]=$list;
 	$bwzt["comment"]=$commenttip;
-	
+
 	//增加发布者头像地址
 	$bwzt['avatar_url'] = avatar($bwzt['uid'],'middle',TRUE);
 	$bwzt['message']=strip_tags($bwzt['message']); //剥去字符串中的 HTML 标签
@@ -222,7 +223,7 @@ if($id) {
 	//分页
 	$perpage = 10;
 	$perpage = mob_perpage($perpage);
-	
+
 	$start = ($page-1)*$perpage;
 
 	//检查开始数
@@ -268,9 +269,9 @@ if($id) {
 				WHERE c.uid='$space[uid]' AND c.idtype='bwztid' $wheresql
 				ORDER BY c.dateline DESC LIMIT $start,$perpage");
 		}
-	} 
+	}
 	else {
-		
+
 		//症状分类
 		$query = $_SGLOBAL['db']->query("SELECT bwztclassid, bwztclassname FROM ".tname('bwztclass'));
 		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
@@ -281,11 +282,11 @@ if($id) {
 		while ($value = $_SGLOBAL['db']->fetch_array($query)) {
 			$bwztdivisionarr[$value['bwztdivisionid']] = $value['bwztdivisionname'];
 		}
-		
+
 		if($_GET['view'] == 'class'){
 			capi_showmessage_by_data("do_success", 0,array('bwztclassarr'=>$bwztclassarr,'bwztdivisionarr'=>$bwztdivisionarr));
 		}
-		
+
 		if($_GET['view'] == 'all') {
 			//大家的日志
 			$wheresql = '1';
@@ -330,9 +331,9 @@ if($id) {
 
 
 		} else {
-			
+
 			if(empty($space['feedfriend']) || $bwztclassid) $_GET['view'] = 'me';
-						
+
 			if($_GET['view'] == 'me') {
 				//查看个人的
 				$wheresql = "b.uid='$space[uid]'";
@@ -342,9 +343,9 @@ if($id) {
 				$wheresql = "b.uid IN ($space[feedfriend])";
 				$theurl = "space.php?uid=$space[uid]&do=$do&view=we";
 				$f_index = 'USE INDEX(dateline)';
-	
+
 				$fuid_actives = array();
-	
+
 				//查看指定好友的
 				$fusername = trim($_GET['fusername']);
 				$fuid = intval($_GET['fuid']);
@@ -357,9 +358,9 @@ if($id) {
 					$f_index = '';
 					$fuid_actives = array($fuid=>' selected');
 				}
-	
+
 				$actives = array('we'=>' class="active"');
-	
+
 				//好友列表
 				$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('friend')." WHERE uid='$space[uid]' AND status='1' ORDER BY num DESC, dateline DESC LIMIT 0,500");
 				while ($value = $_SGLOBAL['db']->fetch_array($query)) {
@@ -368,7 +369,7 @@ if($id) {
 				}
 			}
 		}
-		
+
 
 		//分类
 		if($bwztclassid) {
@@ -381,7 +382,7 @@ if($id) {
 			$wheresql .= " AND b.bwztdivisionid='$bwztdivisionid'";
 			$theurl .= "&bwztdivisionid=$bwztdivisionid";
 		}
-		
+
 		//设置权限
 		$_GET['friend'] = intval($_GET['friend']);
 		if($_GET['friend']) {
@@ -422,7 +423,7 @@ if($id) {
 				}
 				if($value['pic']) $value['pic'] = pic_cover_get($value['pic'], $value['picflag']);
 				$value['pics']=json_decode($value['pics']);//json解密picurls
-				
+
 				//增加发布者头像地址
 				$value['avatar_url'] = avatar($value['uid'],'middle',TRUE);
 				$list[] = $value;
