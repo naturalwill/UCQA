@@ -139,6 +139,8 @@ if($view == 'userapp') {
 			$value['name']=empty($value['name'])?$value['author']:$value['name'];
 			$value['isnew']=$value['new'];
 			unset($value['new']);
+			
+            $value['avatar_url'] = avatar($value['uid'],'middle',TRUE);
 			$list[] = $value;
 		}
 		//·ÖÒ³
