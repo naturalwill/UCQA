@@ -235,21 +235,22 @@ CREATE TABLE uchome_clickuser (
 -- 表的结构 'uchome_comment'
 --
 
-CREATE TABLE uchome_comment (
-  cid mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL default '0',
-  id mediumint(8) unsigned NOT NULL default '0',
-  idtype varchar(20) NOT NULL default '',
-  authorid mediumint(8) unsigned NOT NULL default '0',
-  author varchar(15) NOT NULL default '',
-  ip varchar(20) NOT NULL default '',
-  dateline int(10) unsigned NOT NULL default '0',
-  message text NOT NULL,
-  magicflicker tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (cid),
-  KEY authorid (authorid, idtype),
-  KEY id (id, idtype, dateline)
-) ENGINE=MyISAM;
+CREATE TABLE `uchome_comment` (
+ `cid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+ `refercid` mediumint(9) unsigned NOT NULL DEFAULT '0',
+ `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+ `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+ `idtype` varchar(20) NOT NULL DEFAULT '',
+ `authorid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+ `author` varchar(15) NOT NULL DEFAULT '',
+ `ip` varchar(20) NOT NULL DEFAULT '',
+ `dateline` int(10) unsigned NOT NULL DEFAULT '0',
+ `message` text NOT NULL,
+ `magicflicker` tinyint(1) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`cid`),
+ KEY `authorid` (`authorid`,`idtype`),
+ KEY `id` (`id`,`idtype`,`dateline`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 

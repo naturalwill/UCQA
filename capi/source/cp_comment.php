@@ -61,7 +61,7 @@ if(capi_submitcheck('commentsubmit')) {
 			$comment['message'] = preg_replace("/\<div class=\"quote\"\>\<span class=\"q\"\>.*?\<\/span\>\<\/div\>/is", '', $comment['message']);
 			//bbcode转换
 			$comment['message'] = html2bbcode($comment['message']);
-			$message = addslashes("<div class=\"quote\"><span class=\"q\"><b>".$_SN[$comment['authorid']]."</b>: ".getstr($comment['message'], 150, 0, 0, 0, 2, 1).'</span></div>').$message;
+			//$message = addslashes("<div class=\"quote\"><span class=\"q\"><b>".$_SN[$comment['authorid']]."</b>: ".getstr($comment['message'], 150, 0, 0, 0, 2, 1).'</span></div>').$message;
 			if($comment['idtype']=='uid') {
 				$id = $comment['authorid'];
 			}
@@ -374,6 +374,7 @@ if(capi_submitcheck('commentsubmit')) {
 	}
 
 	$setarr = array(
+		'refercid' => $cid,
 		'uid' => $tospace['uid'],
 		'id' => $id,
 		'idtype' => $_POST['idtype'],
