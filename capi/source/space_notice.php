@@ -140,7 +140,7 @@ if($view == 'userapp') {
 			$value['isnew']=$value['new'];
 			unset($value['new']);
 			
-            $value['avatar_url'] = avatar($value['uid'],'middle',TRUE);
+            $value['avatar_url'] = avatar($value['authorid'],'middle',TRUE);
 			$list[] = $value;
 		}
 		//·ÖÒ³
