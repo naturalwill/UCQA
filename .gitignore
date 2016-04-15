@@ -11,3 +11,5 @@
 /attachment/*
 !/attachment/index.htm
 /capi/test.php
+/vendor
+!/vendor/.gitkeep

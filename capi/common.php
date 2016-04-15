@@ -27,6 +27,15 @@ include_once(S_ROOT.'./source/function_common.php');
 include_once(S_ROOT.'./vendor/autoload.php');
 include_once(S_ROOT.'./capi/function_capi.php');
 
+
+//--------log-----------
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+// create a log channel
+$log = new Logger('capi');
+$log->pushHandler(new StreamHandler(S_ROOT.'./data/log/capi.log', Logger::DEBUG ));
+
+
 //时间
 $mtime = explode(' ', microtime());
 $_SGLOBAL['timestamp'] = $mtime[1];
@@ -80,6 +89,9 @@ $_SGLOBAL['refer'] = empty($_SERVER['HTTP_REFERER'])?'':$_SERVER['HTTP_REFERER']
 //if(empty($_GET['m_timestamp']) || $_SGLOBAL['mobile'] != md5($_GET['m_timestamp']."\t".$_SCONFIG['sitekey'])) $_SGLOBAL['mobile'] = '';
 $_SGLOBAL['mobile'] = '1';
 
+$result = var_export($_SGLOBAL,true);
+$log->addInfo('mobile',array("GLOBAL"=>$result));
+
 //登录注册防灌水机
 if(empty($_SCONFIG['login_action'])) $_SCONFIG['login_action'] = md5('login'.md5($_SCONFIG['sitekey']));
 if(empty($_SCONFIG['register_action'])) $_SCONFIG['register_action'] = md5('register'.md5($_SCONFIG['sitekey']));
@@ -110,8 +122,12 @@ if($_SERVER['REQUEST_URI']) {
 }
 
 $_REQUEST['m_auth'] = rawurldecode($_REQUEST['m_auth']);
+$result = var_export($_SGLOBAL,true);
+$log->addInfo('pre_login',array("GLOBAL"=>$result));
 //判断用户登录状态
 checkauth();
+$result = var_export($_SGLOBAL,true);
+$log->addInfo('login',array("GLOBAL"=>$result));
 $_SGLOBAL['uhash'] = md5($_SGLOBAL['supe_uid']."\t".substr($_SGLOBAL['timestamp'], 0, 6));
 
 //用户菜单
