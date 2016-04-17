@@ -123,14 +123,11 @@ if($_SERVER['REQUEST_URI']) {
 	}
 }
 
-$_REQUEST['m_auth'] = rawurldecode($_REQUEST['m_auth']);
-//$result = var_export($_SGLOBAL,true);
-//$log->addInfo('pre_login',array("GLOBAL"=>$result));
+$_GET['m_auth']=rawurldecode($_GET['m_auth']);
+//$_REQUEST['m_auth'] = rawurldecode($_REQUEST['m_auth']);
+
 //判断用户登录状态
 checkauth();
-//$result = var_export($_SGLOBAL,true);
-//$log->addInfo('login',array("server"=>$result));
-//$log->addInfo('global:'.var_export($_SGLOBAL));
 
 $_SGLOBAL['uhash'] = md5($_SGLOBAL['supe_uid']."\t".substr($_SGLOBAL['timestamp'], 0, 6));
 
