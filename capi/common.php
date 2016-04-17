@@ -29,11 +29,13 @@ include_once(S_ROOT.'./capi/function_capi.php');
 
 
 //--------log-----------
+
 //use Monolog\Logger;
 //use Monolog\Handler\StreamHandler;
-// create a log channel
+//// create a log channel
 //$log = new Logger('capi');
-//$log->pushHandler(new StreamHandler(S_ROOT.'./data/log/capi.log', Logger::DEBUG ));
+//$log->pushHandler(new StreamHandler(S_ROOT.'./data/log/capi.log', Logger::DEBUG));
+//$log->addInfo('get:'.$_SERVER['REQUEST_URI']."|post:".file_get_contents("php://input"));
 
 
 //时间
