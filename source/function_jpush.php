@@ -1,43 +1,25 @@
 <?php
 
-use JPush\Model as M;
-use JPush\JPushClient;
-use JPush\JPushLog;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-
-use JPush\Exception\APIConnectionException;
-use JPush\Exception\APIRequestException;
-
 //$extras is array, title and message is string
 function capi_jpush($uidarr,$message,$title=null,$extras=null){
-	//$br = '<br/>';
-	//$spilt = ' - ';
+	
+	$client = new JPush(JPUSH_APP_KEY, JPUSH_MASTER_SECRET);
 
-	//JPushLog::setLogHandlers(array(new StreamHandler('jpush.log', Logger::DEBUG)));
-	$client = new JPushClient(JPUSH_APP_KEY, JPUSH_MASTER_SECRET);
 
 	try {
 		
+$result = $client->push()
+    ->setPlatform(array('ios', 'android'))
+    ->addAlias($uidarr)
+  //  ->addTag(array('tag1', 'tag2'))
+    ->setNotificationAlert($message)
+    ->addAndroidNotification($message, $title, 1, $extras)
+    ->addIosNotification($message, JPUSH_IOS_SOUND, '+1', true, null, $extras)
+    //->setMessage("msg content", 'msg title', 'type', array("key1"=>"value1", "key2"=>"value2"))
+   // ->setOptions(100000, 3600, null, false)
+    ->send();
 			
-		// easy push with ios badge +1
-		$result = $client->push()
-			->setPlatform(M\Platform('android', 'ios'))
-			->setAudience(M\Audience(M\alias($uidarr)))
-			->setNotification(M\notification($message,
-				M\android($message, $title, null, $extras),
-				M\ios($message, JPUSH_IOS_SOUND, "+1", true, $extras))
-			)
-			->printJSON()
-			->send();		
 			
-		/*
-		echo 'Push Success.' . $br;
-		echo 'sendno : ' . $result->sendno . $br;
-		echo 'msg_id : ' .$result->msg_id . $br;
-		echo 'Response JSON : ' . $result->json . $br;
-		*/
-		
 		if(D_BUG) {
 			runlog('jpush','Push Success:'.json_encode($result));
 		}
