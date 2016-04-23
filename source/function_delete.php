@@ -116,6 +116,9 @@ function deletebwzts($bwztids) {
 	
 	//É¾³ý½ÅÓ¡
 	$_SGLOBAL['db']->query("DELETE FROM ".tname('clickuser')." WHERE id IN (".simplode($newbwztids).") AND idtype='bwztid'");
+	
+	//É¾³ýÍ¨Öª
+	$_SGLOBAL['db']->query("DELETE FROM ".tname('notification')." WHERE id IN (".simplode($newbwztids).") AND type='bwztcomment'");
 
 	return $bwzts;
 }

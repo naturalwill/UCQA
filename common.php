@@ -10,7 +10,9 @@ define('D_BUG', '1');
 define('Flash_Template', 0);
 
 D_BUG?error_reporting(7):error_reporting(0);
+if(get_magic_quotes_runtime()){
 set_magic_quotes_runtime(0);
+}
 
 $_SGLOBAL = $_SCONFIG = $_SBLOCK = $_TPL = $_SCOOKIE = $_SN = $space = array();
 
