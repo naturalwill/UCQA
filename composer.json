@@ -1,6 +1,7 @@
 {
     "require": {
-        "monolog/monolog": "^1.19",
-        "jpush/jpush": "^3.3"
+        "jpush/jpush": "^3.3",
+        "monolog/monolog": "*",
+		"illuminate/database": "^5.2"
     }
 }
