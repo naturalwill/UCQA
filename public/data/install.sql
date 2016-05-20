@@ -235,7 +235,7 @@ CREATE TABLE uchome_clickuser (
 -- 表的结构 'uchome_comment'
 --
 
-CREATE TABLE `uchome_comment` (
+CREATE TABLE uchome_comment (
  `cid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
  `refercid` mediumint(9) unsigned NOT NULL DEFAULT '0',
  `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -1701,7 +1701,7 @@ CREATE TABLE uchome_visitor (
 -- 表的结构 `uchome_bwzt`
 --
 
-CREATE TABLE IF NOT EXISTS `uchome_bwzt` (
+CREATE TABLE uchome_bwzt (
   `bwztid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `topicid` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -1739,7 +1739,7 @@ CREATE TABLE IF NOT EXISTS `uchome_bwzt` (
 -- 表的结构 `uchome_bwztclass`
 --
 
-CREATE TABLE IF NOT EXISTS `uchome_bwztclass` (
+CREATE TABLE uchome_bwztclass (
   `bwztclassid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `bwztclassname` char(40) NOT NULL DEFAULT '',
   `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -1755,7 +1755,7 @@ CREATE TABLE IF NOT EXISTS `uchome_bwztclass` (
 -- 表的结构 `uchome_bwztdivision`
 --
 
-CREATE TABLE IF NOT EXISTS `uchome_bwztdivision` (
+CREATE TABLE uchome_bwztdivision (
   `bwztdivisionid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `bwztdivisionname` char(40) NOT NULL DEFAULT '',
   `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -1770,7 +1770,7 @@ CREATE TABLE IF NOT EXISTS `uchome_bwztdivision` (
 -- 表的结构 `uchome_bwztfield`
 --
 
-CREATE TABLE IF NOT EXISTS `uchome_bwztfield` (
+CREATE TABLE uchome_bwztfield (
   `bwztid` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `tag` varchar(255) NOT NULL DEFAULT '',
@@ -1792,7 +1792,7 @@ CREATE TABLE IF NOT EXISTS `uchome_bwztfield` (
 -- 表的结构 `uchome_tagbwzt`
 --
 
-CREATE TABLE IF NOT EXISTS `uchome_tagbwzt` (
+CREATE TABLE uchome_tagbwzt (
   `tagid` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `bwztid` mediumint(8) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`tagid`,`bwztid`)
