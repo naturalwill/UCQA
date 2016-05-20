@@ -1,0 +1,13 @@
+/public/config.php
+/public/data/*.lock
+/public/data/*.php
+/public/data/*.txt
+/public/data/*/*.php
+/public/uc_client/data/cache/*.php
+/public/uc_server/data/*.lock
+/public/uc_server/data/*.php
+!/public/uc_server/data/*/index.htm
+/public/uc_server/data/*/*
+/public/attachment/*
+!/public/attachment/index.htm
+/vendor
