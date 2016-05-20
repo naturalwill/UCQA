@@ -1,10 +1,10 @@
 <?php
 
 /*
-	[UCenter] (C)2001-2009 Comsenz Inc.
+	[UCenter] (C)2001-2099 Comsenz Inc.
 	This is NOT a freeware, use is subject to license terms
 
-	$Id: user.php 916 2009-01-19 05:56:07Z monkey $
+	$Id: user.php 1082 2011-04-07 06:42:14Z svn_project_zhangjie $
 */
 
 !defined('IN_UC') && exit('Access Denied');
@@ -26,11 +26,9 @@ class usercontrol extends base {
 	function usercontrol() {
 		parent::__construct();
 		$this->load('user');
-		//note client 仅在需要时初始化 $this->app
 		$this->app = $this->cache['apps'][UC_APPID];
 	}
 
-	//note public 外部接口
 	// -1 未开启
 	function onsynlogin() {
 		$this->init_input();
@@ -49,7 +47,6 @@ class usercontrol extends base {
 		return '';
 	}
 
-	//note public 外部接口
 	function onsynlogout() {
 		$this->init_input();
 		if($this->app['synlogin']) {
@@ -64,7 +61,6 @@ class usercontrol extends base {
 		return '';
 	}
 
-	//note public 外部接口 注册校验接口
 	function onregister() {
 		$this->init_input();
 		$username = $this->input('username');
@@ -72,6 +68,7 @@ class usercontrol extends base {
 		$email = $this->input('email');
 		$questionid = $this->input('questionid');
 		$answer = $this->input('answer');
+		$regip = $this->input('regip');
 
 		if(($status = $this->_check_username($username)) < 0) {
 			return $status;
@@ -79,11 +76,10 @@ class usercontrol extends base {
 		if(($status = $this->_check_email($email)) < 0) {
 			return $status;
 		}
-		$uid = $_ENV['user']->add_user($username, $password, $email, 0, $questionid, $answer);
+		$uid = $_ENV['user']->add_user($username, $password, $email, 0, $questionid, $answer, $regip);
 		return $uid;
 	}
 
-	//note public 外部接口 编辑帐户信息
 	function onedit() {
 		$this->init_input();
 		$username = $this->input('username');
@@ -107,7 +103,6 @@ class usercontrol extends base {
 		return $status;
 	}
 
-	//note public 外部接口 登陆接口
 	function onlogin() {
 		$this->init_input();
 		$isuid = $this->input('isuid');
@@ -116,14 +111,15 @@ class usercontrol extends base {
 		$checkques = $this->input('checkques');
 		$questionid = $this->input('questionid');
 		$answer = $this->input('answer');
-		if($isuid) {
+		if($isuid == 1) {
 			$user = $_ENV['user']->get_user_by_uid($username);
+		} elseif($isuid == 2) {
+			$user = $_ENV['user']->get_user_by_email($username);
 		} else {
 			$user = $_ENV['user']->get_user_by_username($username);
 		}
 
 		$passwordmd5 = preg_match('/^\w{32}$/', $password) ? $password : md5($password);
-		//note 用户名不存在
 		if(empty($user)) {
 			$status = -1;
 		} elseif($user['password'] != md5($passwordmd5.$user['salt'])) {
@@ -137,14 +133,12 @@ class usercontrol extends base {
 		return array($status, $user['username'], $password, $user['email'], $merge);
 	}
 
-	//note public 外部接口 ajax 校验 EMAIL
 	function oncheck_email() {
 		$this->init_input();
 		$email = $this->input('email');
 		return $this->_check_email($email);
 	}
 
-	//note public 外部接口 ajax 校验用户名
 	function oncheck_username() {
 		$this->init_input();
 		$username = $this->input('username');
@@ -155,7 +149,6 @@ class usercontrol extends base {
 		}
 	}
 
-	//note public 外部接口
 	function onget_user() {
 		$this->init_input();
 		$username = $this->input('username');
@@ -172,13 +165,11 @@ class usercontrol extends base {
 	}
 
 
-	//note public 得到保护的用户列表
 	function ongetprotected() {
 		$protectedmembers = $this->db->fetch_all("SELECT uid,username FROM ".UC_DBTABLEPRE."protectedmembers GROUP BY username");
 		return $protectedmembers;
 	}
 
-	//note 用户中心, 非外部接口.
 	function ondelete() {
 		$this->init_input();
 		$uid = $this->input('uid');
@@ -221,7 +212,6 @@ class usercontrol extends base {
 			return $status;
 		}
 		$uid = $_ENV['user']->add_user($newusername, $password, $email, $uid);
-		$this->db->query("UPDATE ".UC_DBTABLEPRE."pms SET msgfrom='$newusername' WHERE msgfromid='$uid' AND msgfrom='$oldusername'");
 		$this->db->query("DELETE FROM ".UC_DBTABLEPRE."mergemembers WHERE appid='".$this->app['appid']."' AND username='$oldusername'");
 		return $uid;
 	}
@@ -233,7 +223,6 @@ class usercontrol extends base {
 		return NULL;
 	}
 
-	//note private 校验用户名
 	function _check_username($username) {
 		$username = addslashes(trim(stripslashes($username)));
 		if(!$_ENV['user']->check_username($username)) {
@@ -246,7 +235,6 @@ class usercontrol extends base {
 		return 1;
 	}
 
-	//note private 校验email
 	function _check_email($email, $username = '') {
 		if(empty($this->settings)) {
 			$this->settings = $this->cache('settings');
@@ -262,16 +250,9 @@ class usercontrol extends base {
 		}
 	}
 
-	/**
-	 * -1 身份不合法
-	 * -2 上传的数据流不合法
-	 * -3 没有上传头象
-	 */
-	//note public 外部接口 flash 上传头像
 	function onuploadavatar() {
 	}
 
-	//note public 外部接口 flash 方式裁剪头像 COOKIE 判断身份
 	function onrectavatar() {
 	}
 	function flashdata_decode($s) {

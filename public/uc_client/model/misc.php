@@ -1,10 +1,10 @@
 <?php
 
 /*
-	[UCenter] (C)2001-2009 Comsenz Inc.
+	[UCenter] (C)2001-2099 Comsenz Inc.
 	This is NOT a freeware, use is subject to license terms
 
-	$Id: misc.php 846 2008-12-08 05:37:05Z zhaoxiongfei $
+	$Id: misc.php 1059 2011-03-01 07:25:09Z monkey $
 */
 
 !defined('IN_UC') && exit('Access Denied');
@@ -94,9 +94,17 @@ class miscmodel {
 			$out .= "Connection: Close\r\n";
 			$out .= "Cookie: $cookie\r\n\r\n";
 		}
-		$fp = @fsockopen(($ip ? $ip : $host), $port, $errno, $errstr, $timeout);
+
+		if(function_exists('fsockopen')) {
+			$fp = @fsockopen(($ip ? $ip : $host), $port, $errno, $errstr, $timeout);
+		} elseif (function_exists('pfsockopen')) {
+			$fp = @pfsockopen(($ip ? $ip : $host), $port, $errno, $errstr, $timeout);
+		} else {
+			$fp = false;
+		}
+
 		if(!$fp) {
-			return '';//note $errstr : $errno \r\n
+			return '';
 		} else {
 			stream_set_blocking($fp, $block);
 			stream_set_timeout($fp, $timeout);
@@ -124,7 +132,6 @@ class miscmodel {
 		}
 	}
 
-	//note 暂时只支持1维数组
 	function array2string($arr) {
 		$s = $sep = '';
 		if($arr && is_array($arr)) {
@@ -136,7 +143,6 @@ class miscmodel {
 		return $s;
 	}
 
-	//note 暂时只支持1维数组
 	function string2array($s) {
 		$arr = explode(UC_ARRAY_SEP_2, $s);
 		$arr2 = array();

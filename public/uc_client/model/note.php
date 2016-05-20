@@ -1,17 +1,17 @@
 <?php
 
 /*
-	[UCenter] (C)2001-2009 Comsenz Inc.
+	[UCenter] (C)2001-2099 Comsenz Inc.
 	This is NOT a freeware, use is subject to license terms
 
-	$Id: note.php 916 2009-01-19 05:56:07Z monkey $
+	$Id: note.php 1059 2011-03-01 07:25:09Z monkey $
 */
 
 !defined('IN_UC') && exit('Access Denied');
 
-define('UC_NOTE_REPEAT', 5);	//note 通知重复次数
-define('UC_NOTE_TIMEOUT', 15);	//note 通知超时时间(秒)
-define('UC_NOTE_GC', 10000);	//note 过期通知的回收概率，该值越大，概率越低
+define('UC_NOTE_REPEAT', 5);
+define('UC_NOTE_TIMEOUT', 15);
+define('UC_NOTE_GC', 10000);
 
 define('API_RETURN_FAILED', '-1');
 
@@ -21,7 +21,7 @@ class notemodel {
 	var $base;
 	var $apps;
 	var $operations = array();
-	var $notetype = 'HTTP';//note HTTP|INCLUDE
+	var $notetype = 'HTTP';
 
 	function __construct(&$base) {
 		$this->notemodel($base);
@@ -31,12 +31,6 @@ class notemodel {
 		$this->base = $base;
 		$this->db = $base->db;
 		$this->apps = $this->base->cache('apps');
-		/** note
-		 * 1. 操作的名称，如：删除用户，测试连通，删除好友，取TAG数据，更新客户端缓存
-		 * 2. 调用的应用的接口参数，拼接规则为 APP_URL/api/uc.php?action=test&ids=1,2,3
-		 * 3. 回调的模块名称
-		 * 4. 回调的模块方法（$appid, $content）
-		 */
 		$this->operations = array(
 			'test'=>array('', 'action=test'),
 			'deleteuser'=>array('', 'action=deleteuser'),
@@ -55,44 +49,15 @@ class notemodel {
 		);
 	}
 
-	/**
-	 * 统计通知的总条数
-	 *
-	 * @return int
-	 */
 	function get_total_num($all = TRUE) {
 	}
 
-	/**
-	 * Enter 得到通知列表
-	 *
-	 * @param int $page
-	 * @param int$ppp
-	 * @param int $totalnum
-	 * @return array 结果集
-	 */
 	function get_list($page, $ppp, $totalnum, $all = TRUE) {
 	}
 
-	/**
-	 * 删除通知
-	 *
-	 * @param string/array $ids
-	 * @return 受影响的行数
-	 */
 	function delete_note($ids) {
 	}
 
-	/**
-	 * 添加通知列表
-	 *
-	 * @param string 操作
-	 * @param string getdata
-	 * @param string postdata
-	 * @param array appids 指定通知的 APPID
-	 * @param int pri 优先级，值越大表示越高
-	 * @return int 插入的ID
-	 */
 	function add($operation, $getdata='', $postdata='', $appids=array(), $pri = 0) {
 		$extra = $varextra = '';
 		$appadd = $varadd = array();
@@ -128,22 +93,16 @@ class notemodel {
 	}
 
 	function _send() {
-		//note 判断是否有通知
 
-		//note 如果内存表记录不存在，那么可能 mysql 被重启，需要再次判断通知是否存在
 
-		//note 查看是否有通知
 		$note = $this->_get_note();
 		if(empty($note)) {
-			//note 标示为不需要通知
 			$this->db->query("REPLACE INTO ".UC_DBTABLEPRE."vars SET name='noteexists".UC_APPID."', value='0'");
 			return NULL;
 		}
 
-		//note mysql只发送自己的通知
 		$this->sendone(UC_APPID, 0, $note);
 
-		//note 垃圾清理
 		$this->_gc();
 	}
 
@@ -174,7 +133,7 @@ class notemodel {
 			$response = trim($_ENV['misc']->dfopen2($url, 0, $note['postdata'], '', 1, $app['ip'], UC_NOTE_TIMEOUT, TRUE));
 		}
 
-		$returnsucceed = $response != '' && ($response == 1 || is_array(xml_unserialize($response)));//note 当确实返回为1的时候才认为是通知成功
+		$returnsucceed = $response != '' && ($response == 1 || is_array(xml_unserialize($response)));
 
 		$closedsqladd = $this->_close_note($note, $this->apps, $returnsucceed, $appid) ? ",closed='1'" : '';//
 
@@ -203,7 +162,6 @@ class notemodel {
 		rand(0, UC_NOTE_GC) == 0 && $this->db->query("DELETE FROM ".UC_DBTABLEPRE."notelist WHERE closed='1'");
 	}
 
-	//note 判断是否需要关闭通知
 	function _close_note($note, $apps, $returnsucceed, $appid) {
 		$note['app'.$appid] = $returnsucceed ? 1 : $note['app'.$appid] - 1;
 		$appcount = count($apps);
