@@ -4,7 +4,7 @@
 	$Id: do.php 12354 2009-06-11 08:14:06Z liguode $
 */
 
-include_once('./common.php');
+include_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'./common.php');
 
 //获取方法
 $ac = empty($_GET['ac'])?'':$_GET['ac'];

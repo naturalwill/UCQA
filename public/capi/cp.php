@@ -5,7 +5,7 @@
 */
 
 //通用文件
-include_once('./common.php');
+include_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'./common.php');
 include_once(S_ROOT.'./source/function_cp.php');
 include_once(S_ROOT.'./source/function_magic.php');
 

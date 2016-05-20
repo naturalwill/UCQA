@@ -4,6 +4,19 @@
 	$Id: index.php 13003 2009-08-05 06:46:06Z liguode $
 */
 
+//PATH_INFO
+$pathinfo = empty($_SERVER['PATH_INFO']) ? '' : explode('/', $_SERVER['PATH_INFO']);
+if (count($pathinfo) > 2 && empty($pathinfo[0])) {
+    //允许的方法
+    $acs1 = array('api');
+    $acs2 = array('do', 'cp', 'space', 'network');
+    if (!empty($pathinfo[1]) && in_array($pathinfo[1], $acs1)
+		&& !empty($pathinfo[2]) && in_array($pathinfo[2], $acs2)) {
+			include_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'capi/'.$pathinfo[2].'.php');
+			exit;
+    }
+}
+
 include_once('./common.php');
 
 if(is_numeric($_SERVER['QUERY_STRING'])) {
