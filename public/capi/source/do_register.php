@@ -8,20 +8,20 @@ if(!defined('IN_UCHOME')) {
 	exit('Access Denied');
 }
 
-$op = $_GET['op'] ? trim($_GET['op']) : '';
+$op = $_REQUEST['op'] ? trim($_REQUEST['op']) : '';
 
 if($_SGLOBAL['supe_uid']) {
-	showmessage('do_success', 'space.php?do=home', 0);
+	capi_showmessage_by_data('do_success', 0);
 }
 
 //没有登录表单
 $_SGLOBAL['nologinform'] = 1;
 
 //好友邀请
-$uid = empty($_GET['uid'])?0:intval($_GET['uid']);
-$code = empty($_GET['code'])?'':$_GET['code'];
-$app = empty($_GET['app'])?'':intval($_GET['app']);
-$invite = empty($_GET['invite'])?'':$_GET['invite'];
+$uid = empty($_REQUEST['uid'])?0:intval($_REQUEST['uid']);
+$code = empty($_REQUEST['code'])?'':$_REQUEST['code'];
+$app = empty($_REQUEST['app'])?'':intval($_REQUEST['app']);
+$invite = empty($_REQUEST['invite'])?'':$_REQUEST['invite'];
 $invitearr = array();
 
 $invitepay = getreward('invitecode', 0);
@@ -46,52 +46,53 @@ if(empty($op)) {
 
 	if($_SCONFIG['closeregister']) {
 		if($_SCONFIG['closeinvite']) {
-			showmessage('not_open_registration');
+			capi_showmessage_by_data('not_open_registration');
 		} elseif(empty($invitearr)) {
-			showmessage('not_open_registration_invite');
+			capi_showmessage_by_data('not_open_registration_invite');
 		}
 	}
 
 	//是否关闭站点
 	checkclose();
 
-	if(submitcheck('registersubmit')) {
+	if(capi_submitcheck('registersubmit')) {
 
 		//已经注册用户
 		if($_SGLOBAL['supe_uid']) {
-			showmessage('registered', 'space.php');
+			capi_showmessage_by_data('registered');
 		}
 
 		if($_SCONFIG['seccode_register']) {
 			include_once(S_ROOT.'./source/function_cp.php');
-			if(!ckseccode($_POST['seccode'])) {
-				showmessage('incorrect_code');
+			if(!capi_ckseccode($_REQUEST['seccode'], $_REQUEST['m_auth'])) {
+				capi_showmessage_by_data('incorrect_code');
 			}
 		}
 
 		if(!@include_once S_ROOT.'./uc_client/client.php') {
-			showmessage('system_error');
+			capi_showmessage_by_data('system_error');
 		}
 
-		if($_POST['password'] != $_POST['password2']) {
-			showmessage('password_inconsistency');
+		if($_REQUEST['password'] != $_REQUEST['password2']) {
+			capi_showmessage_by_data('password_inconsistency');
 		}
 
-		if(!$_POST['password'] || $_POST['password'] != addslashes($_POST['password'])) {
-			showmessage('profile_passwd_illegal');
+		if(!$_REQUEST['password'] || $_REQUEST['password'] != addslashes($_REQUEST['password'])) {
+			capi_showmessage_by_data('profile_passwd_illegal');
 		}
 		
-		$username = trim($_POST['username']);
-		$password = $_POST['password'];
+		$username = trim($_REQUEST['username']);
+		$password = $_REQUEST['password'];
+		$_REQUEST['email'] = "$username@dawnlightning.com";
 		
-		$email = isemail($_POST['email'])?$_POST['email']:'';
+		$email = isemail($_REQUEST['email'])?$_REQUEST['email']:'';
 		if(empty($email)) {
-			showmessage('email_format_is_wrong');
+			capi_showmessage_by_data('email_format_is_wrong');
 		}
 		//检查邮件
 		if($_SCONFIG['checkemail']) {
 			if($count = getcount('spacefield', array('email'=>$email))) {
-				showmessage('email_has_been_registered');
+				capi_showmessage_by_data('email_has_been_registered');
 			}
 		}
 		//检查IP
@@ -100,7 +101,7 @@ if(empty($op)) {
 			$query = $_SGLOBAL['db']->query("SELECT dateline FROM ".tname('space')." WHERE regip='$onlineip' ORDER BY dateline DESC LIMIT 1");
 			if($value = $_SGLOBAL['db']->fetch_array($query)) {
 				if($_SGLOBAL['timestamp'] - $value['dateline'] < $_SCONFIG['regipdate']*3600) {
-					showmessage('regip_has_been_registered', '', 1, array($_SCONFIG['regipdate']));
+					capi_showmessage_by_data('regip_has_been_registered',  1, array($_SCONFIG['regipdate']));
 				}
 			}
 		}
@@ -108,19 +109,19 @@ if(empty($op)) {
 		$newuid = uc_user_register($username, $password, $email);
 		if($newuid <= 0) {
 			if($newuid == -1) {
-				showmessage('user_name_is_not_legitimate');
+				capi_showmessage_by_data('user_name_is_not_legitimate');
 			} elseif($newuid == -2) {
-				showmessage('include_not_registered_words');
+				capi_showmessage_by_data('include_not_registered_words');
 			} elseif($newuid == -3) {
-				showmessage('user_name_already_exists');
+				capi_showmessage_by_data('user_name_already_exists');
 			} elseif($newuid == -4) {
-				showmessage('email_format_is_wrong');
+				capi_showmessage_by_data('email_format_is_wrong');
 			} elseif($newuid == -5) {
-				showmessage('email_not_registered');
+				capi_showmessage_by_data('email_not_registered');
 			} elseif($newuid == -6) {
-				showmessage('email_has_been_registered');
+				capi_showmessage_by_data('email_has_been_registered');
 			} else {
-				showmessage('register_error');
+				capi_showmessage_by_data('register_error');
 			}
 		} else {
 			$setarr = array(
@@ -168,9 +169,10 @@ if(empty($op)) {
 
 			//在线session
 			insertsession($setarr);
-
+			
+			$auth = authcode("$setarr[password]\t$setarr[uid]", 'ENCODE');
 			//设置cookie
-			ssetcookie('auth', authcode("$setarr[password]\t$setarr[uid]", 'ENCODE'), 2592000);
+			ssetcookie('auth', $auth, 2592000);
 			ssetcookie('loginuser', $username, 31536000);
 			ssetcookie('_refer', '');
 
@@ -195,41 +197,60 @@ if(empty($op)) {
 			//变更记录
 			if($_SCONFIG['my_status']) inserttable('userlog', array('uid'=>$newuid, 'action'=>'add', 'dateline'=>$_SGLOBAL['timestamp']), 0, true);
 
-			showmessage('registered', $jumpurl);
+			capi_showmessage_by_data('registered',0,array("space"=>getspace($space["uid"]), "m_auth"=>rawurlencode($auth)));
 		}
 
 	}
 	
 	$register_rule = data_get('registerrule');
 
-	include template('do_register');
+	//include template('do_register');
 
 } elseif($op == "checkusername") {
 
-	$username = trim($_GET['username']);
+	$username = trim($_REQUEST['username']);
 	if(empty($username)) {
-		showmessage('user_name_is_not_legitimate');
+		capi_showmessage_by_data('user_name_is_not_legitimate');
 	}
 	@include_once (S_ROOT.'./uc_client/client.php');
 	$ucresult = uc_user_checkname($username);
 
 	if($ucresult == -1) {
-		showmessage('user_name_is_not_legitimate');
+		capi_showmessage_by_data('user_name_is_not_legitimate');
 	} elseif($ucresult == -2) {
-		showmessage('include_not_registered_words');
+		capi_showmessage_by_data('include_not_registered_words');
 	} elseif($ucresult == -3) {
-		showmessage('user_name_already_exists');
+		capi_showmessage_by_data('user_name_already_exists');
 	} else {
-		showmessage('succeed');
+		capi_showmessage_by_data('succeed');
 	}
 } elseif($op == "checkseccode") {
 	
 	include_once(S_ROOT.'./source/function_cp.php');
-	if(ckseccode(trim($_GET['seccode']))) {
-		showmessage('succeed');
+	if(ckseccode(trim($_REQUEST['seccode']))) {
+		capi_showmessage_by_data('succeed');
 	} else {
-		showmessage('incorrect_code');
+		capi_showmessage_by_data('incorrect_code');
 	}
+} elseif($op ==  "seccode"){
+	//验证码
+	$seccode = mkseccode();
+
+	//设定cookie
+	capi_showmessage_by_data("rest_success", 0, array("seccode_auth"=>rawurlencode(authcode($seccode, 'ENCODE')), "seccode"=>$seccode));
+}
+
+//生成随机
+function mkseccode() {
+	$seccode = random(6, 1);
+	$s = sprintf('%04s', base_convert($seccode, 10, 24));
+	$seccode = '';
+	$seccodeunits = 'BCEFGHJKMPQRTVWXY2346789';
+	for($i = 0; $i < 4; $i++) {
+		$unit = ord($s{$i});
+		$seccode .= ($unit >= 0x30 && $unit <= 0x39) ? $seccodeunits[$unit - 0x30] : $seccodeunits[$unit - 0x57];
+	}
+	return $seccode;
 }
 
 ?>

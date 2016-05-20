@@ -11,34 +11,34 @@ if(!defined('IN_UCHOME')) {
 if(submitcheck('pwdsubmit')) {
 	
 	if($_POST['newpasswd1'] != $_POST['newpasswd2']) {
-		showmessage('password_inconsistency');
+		capi_showmessage_by_data('password_inconsistency');
 	}
 	if($_POST['newpasswd1'] != addslashes($_POST['newpasswd1'])) {
-		showmessage('profile_passwd_illegal');
+		capi_showmessage_by_data('profile_passwd_illegal');
 	}
 	@include_once(S_ROOT.'./uc_client/client.php');
 	
 	$ucresult = uc_user_edit($_SGLOBAL['supe_username'], $_POST['password'], $_POST['newpasswd1'], $space['email']);
 
 	if($ucresult == -1) {
-		showmessage('old_password_invalid');
+		capi_showmessage_by_data('old_password_invalid');
 	} elseif($ucresult == -4) {
-		showmessage('email_format_is_wrong');
+		capi_showmessage_by_data('email_format_is_wrong');
 	} elseif($ucresult == -5) {
-		showmessage('email_not_registered');
+		capi_showmessage_by_data('email_not_registered');
 	} elseif($ucresult == -6) {
-		showmessage('email_has_been_registered');
+		capi_showmessage_by_data('email_has_been_registered');
 	} elseif($ucresult == -7) {
-		showmessage('no_change');
+		capi_showmessage_by_data('no_change');
 	} elseif($ucresult == -8) {
-		showmessage('protection_of_users');
+		capi_showmessage_by_data('protection_of_users');
 	}
 	clearcookie();
-	showmessage('getpasswd_succeed', 'do.php?ac='.$_SCONFIG['login_action']);
+	capi_showmessage_by_data('getpasswd_succeed', 0);
 }
 
-$actives = array('profile' => ' class="active"');
+//$actives = array('profile' => ' class="active"');
 
-include_once template("cp_password");
-
+//include_once template("cp_password");
+capi_showmessage_by_data('non_normal_operation');
 ?>

@@ -131,6 +131,9 @@ if($_GET['op'] == 'delete') {
 		case 'blogid':
 			$url .= "&do=blog&id=$feed[id]";
 			break;
+		case 'bwztid':
+			$url .= "&do=blog&id=$feed[id]";
+			break;
 		case 'picid':
 			$url .= "&do=album&picid=$feed[id]";
 			break;

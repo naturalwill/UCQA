@@ -45,7 +45,7 @@ if($op == 'logout') {
 	$_GET['id'] = intval($_GET['id']);
 	$uidarr = $report = array();
 	
-	if(!in_array($_GET['idtype'], array('picid', 'blogid', 'albumid', 'tagid', 'tid', 'sid', 'uid', 'pid', 'eventid', 'comment', 'post')) || empty($_GET['id'])) {
+	if(!in_array($_GET['idtype'], array('picid', 'blogid', 'bwztid', 'albumid', 'tagid', 'tid', 'sid', 'uid', 'pid', 'eventid', 'comment', 'post')) || empty($_GET['id'])) {
 		showmessage('report_error');
 	}
 	//获取举报记录

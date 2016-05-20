@@ -11,10 +11,24 @@ if(!defined('IN_UCHOME')) {
 include_once(S_ROOT.'./source/function_cp.php');
 
 if($_SGLOBAL['supe_uid']) {
-	showmessage('do_success', 'space.php', 0);
+	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('session')." WHERE username='$_REQUEST[username]' ");
+	if($member = $_SGLOBAL['db']->fetch_array($query)) {
+		$auth = authcode("$member[password]\t$member[uid]", 'ENCODE');
+		$space = getspace($_SGLOBAL['supe_uid']);
+		
+		//æ€§åˆ«
+		$space['sex_org'] = $space['sex'];
+		$space['sex'] = $space['sex']=='1'?lang('man'):($space['sex']=='2'?lang('woman'):'');
+		//å¹´é¾„
+		$space['age'] = ($space['birthyear']&&$space['birthmonth']&&$space['birthday'])?intval((time() - strtotime($space['birthyear'].'/'.$space['birthmonth'].'/'.$space['birthday']))/365/24/3600):'';
+		//å¢žåŠ ç”¨æˆ·å¤´åƒåœ°å€
+		$space['avatar_url'] =$space['avatar']? avatar($space['uid'],'middle',TRUE) : avatar_default();
+		capi_showmessage_by_data('do_success', 0, array("m_auth"=>rawurlencode($auth), 'uhash'=> $_SGLOBAL['uhash']/* ç”¨äºŽæ³¨é”€ */, "formhash"=>formhash(), "space"=>$space));
+	}
+	capi_showmessage_by_data('login_failure_please_re_login');
 }
 
-$refer = empty($_GET['refer'])?rawurldecode($_SCOOKIE['_refer']):$_GET['refer'];
+$refer = empty($_REQUEST['refer'])?rawurldecode($_SCOOKIE['_refer']):$_REQUEST['refer'];
 preg_match("/(admincp|do|cp)\.php\?ac\=([a-z]+)/i", $refer, $ms);
 if($ms) {
 	if($ms[1] != 'cp' || $ms[2] != 'sendmail') $refer = '';
@@ -23,16 +37,16 @@ if(empty($refer)) {
 	$refer = 'space.php?do=home';
 }
 
-//ºÃÓÑÑûÇë
-$uid = empty($_GET['uid'])?0:intval($_GET['uid']);
-$code = empty($_GET['code'])?'':$_GET['code'];
-$app = empty($_GET['app'])?'':intval($_GET['app']);
-$invite = empty($_GET['invite'])?'':$_GET['invite'];
+//å¥½å‹é‚€è¯·
+$uid = empty($_REQUEST['uid'])?0:intval($_REQUEST['uid']);
+$code = empty($_REQUEST['code'])?'':$_REQUEST['code'];
+$app = empty($_REQUEST['app'])?'':intval($_REQUEST['app']);
+$invite = empty($_REQUEST['invite'])?'':$_REQUEST['invite'];
 $invitearr = array();
 $reward = getreward('invitecode', 0);
 if($uid && $code && !$reward['credit']) {
 	$m_space = getspace($uid);
-	if($code == space_key($m_space, $app)) {//ÑéÖ¤Í¨¹ý
+	if($code == space_key($m_space, $app)) {//éªŒè¯é€šè¿‡
 		$invitearr['uid'] = $uid;
 		$invitearr['username'] = $m_space['username'];
 	}
@@ -43,72 +57,78 @@ if($uid && $code && !$reward['credit']) {
 	$url_plus = "uid=$uid&invite=$invite";
 }
 
-//Ã»ÓÐµÇÂ¼±íµ¥
+//æ²¡æœ‰ç™»å½•è¡¨å•
 $_SGLOBAL['nologinform'] = 1;
 
-if(submitcheck('loginsubmit')) {
+if(capi_submitcheck('loginsubmit')) {
 
-	$password = $_POST['password'];
-	$username = trim($_POST['username']);
-	$cookietime = intval($_POST['cookietime']);
+	$password = $_REQUEST['password'];
+	$username = trim($_REQUEST['username']);
+	$cookietime = intval($_REQUEST['cookietime']);
 	
 	$cookiecheck = $cookietime?' checked':'';
 	$membername = $username;
 	
-	if(empty($_POST['username'])) {
-		showmessage('users_were_not_empty_please_re_login', 'do.php?ac='.$_SCONFIG['login_action']);
+	if(empty($_REQUEST['username'])) {
+		capi_showmessage_by_data('users_were_not_empty_please_re_login');
 	}
 	
 	if($_SCONFIG['seccode_login']) {
 		include_once(S_ROOT.'./source/function_cp.php');
-		if(!ckseccode($_POST['seccode'])) {
+		if(!ckseccode($_REQUEST['seccode'])) {
 			$_SGLOBAL['input_seccode'] = 1;
 			include template('do_login');
 			exit;
 		}
 	}
 
-	//Í¬²½»ñÈ¡ÓÃ»§Ô´
+	//åŒæ­¥èŽ·å–ç”¨æˆ·æº
 	if(!$passport = getpassport($username, $password)) {
-		showmessage('login_failure_please_re_login', 'do.php?ac='.$_SCONFIG['login_action']);
+		capi_showmessage_by_data('login_failure_please_re_login', 1, 'do.php?ac='.$_SCONFIG['login_action']);
 	}
 	
 	$setarr = array(
 		'uid' => $passport['uid'],
 		'username' => addslashes($passport['username']),
-		'password' => md5("$passport[uid]|$_SGLOBAL[timestamp]")//±¾µØÃÜÂëËæ»úÉú³É
+		'password' => md5("$passport[uid]|$_SGLOBAL[timestamp]")//æœ¬åœ°å¯†ç éšæœºç”Ÿæˆ
 	);
 	
 	include_once(S_ROOT.'./source/function_space.php');
-	//¿ªÍ¨¿Õ¼ä
-	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('space')." WHERE uid='$setarr[uid]'");
+	//å¼€é€šç©ºé—´
+	$query = $_SGLOBAL['db']->query("SELECT s.*, sf.* FROM ".tname('space')." s LEFT JOIN ".tname('spacefield')." sf ON sf.uid=s.uid WHERE s.uid='$setarr[uid]'");
 	if(!$space = $_SGLOBAL['db']->fetch_array($query)) {
 		$space = space_open($setarr['uid'], $setarr['username'], 0, $passport['email']);
 	}
+	//æ€§åˆ«
+	$space['sex_org'] = $space['sex'];
+	$space['sex'] = $space['sex']=='1'?lang('man'):($space['sex']=='2'?lang('woman'):'');
+	//å¹´é¾„
+	$space['age'] = ($space['birthyear']&&$space['birthmonth']&&$space['birthday'])?intval((time() - strtotime($space['birthyear'].'/'.$space['birthmonth'].'/'.$space['birthday']))/365/24/3600):'';
+
 	
 	$_SGLOBAL['member'] = $space;
 	
-	//ÊµÃû
+	//å®žå
 	realname_set($space['uid'], $space['username'], $space['name'], $space['namestatus']);
 	
-	//¼ìË÷µ±Ç°ÓÃ»§
+	//æ£€ç´¢å½“å‰ç”¨æˆ·
 	$query = $_SGLOBAL['db']->query("SELECT password FROM ".tname('member')." WHERE uid='$setarr[uid]'");
 	if($value = $_SGLOBAL['db']->fetch_array($query)) {
 		$setarr['password'] = addslashes($value['password']);
 	} else {
-		//¸üÐÂ±¾µØÓÃ»§¿â
+		//æ›´æ–°æœ¬åœ°ç”¨æˆ·åº“
 		inserttable('member', $setarr, 0, true);
 	}
 
-	//ÇåÀíÔÚÏßsession
+	//æ¸…ç†åœ¨çº¿session
 	insertsession($setarr);
-	
-	//ÉèÖÃcookie
-	ssetcookie('auth', authcode("$setarr[password]\t$setarr[uid]", 'ENCODE'), $cookietime);
+	$auth = authcode("$setarr[password]\t$setarr[uid]", 'ENCODE');
+	//è®¾ç½®cookie
+	ssetcookie('auth', $auth, $cookietime);
 	ssetcookie('loginuser', $passport['username'], 31536000);
 	ssetcookie('_refer', '');
 	
-	//Í¬²½µÇÂ¼
+	//åŒæ­¥ç™»å½•
 	if($_SCONFIG['uc_status']) {
 		include_once S_ROOT.'./uc_client/client.php';
 		$ucsynlogin = uc_user_synlogin($setarr['uid']);
@@ -116,19 +136,19 @@ if(submitcheck('loginsubmit')) {
 		$ucsynlogin = '';
 	}
 	
-	//ºÃÓÑÑûÇë
+	//å¥½å‹é‚€è¯·
 	if($invitearr) {
-		//³ÉÎªºÃÓÑ
+		//æˆä¸ºå¥½å‹
 		invite_update($invitearr['id'], $setarr['uid'], $setarr['username'], $invitearr['uid'], $invitearr['username'], $app);
 	}
 	$_SGLOBAL['supe_uid'] = $space['uid'];
-	//ÅÐ¶ÏÓÃ»§ÊÇ·ñÉèÖÃÁËÍ·Ïñ
+	//åˆ¤æ–­ç”¨æˆ·æ˜¯å¦è®¾ç½®äº†å¤´åƒ
 	$reward = $setarr = array();
 	$experience = $credit = 0;
 	$avatar_exists = ckavatar($space['uid']);
 	if($avatar_exists) {
 		if(!$space['avatar']) {
-			//½±Àø»ý·Ö
+			//å¥–åŠ±ç§¯åˆ†
 			$reward = getreward('setavatar', 0);
 			$credit = $reward['credit'];
 			$experience = $reward['experience'];
@@ -151,18 +171,26 @@ if(submitcheck('loginsubmit')) {
 		$_SGLOBAL['db']->query("UPDATE ".tname('space')." SET ".implode(',', $setarr)." WHERE uid='$space[uid]'");
 	}
 
-	if(empty($_POST['refer'])) {
-		$_POST['refer'] = 'space.php?do=home';
+	if(empty($_REQUEST['refer'])) {
+		$_REQUEST['refer'] = 'space.php?do=home';
 	}
 	
 	realname_get();
-	
-	showmessage('login_success', $app?"userapp.php?id=$app":$_POST['refer'], 1, array($ucsynlogin));
+
+	//å¢žåŠ ç”¨æˆ·å¤´åƒåœ°å€
+	$space['avatar_url'] =$space['avatar']? avatar($space['uid'],'middle',TRUE):avatar_default();
+
+	//é€šçŸ¥æ•°
+	$space['allnotenum'] = 0;
+	foreach (array('notenum','pokenum','addfriendnum','mtaginvitenum','eventinvitenum','myinvitenum') as $value) {
+		$space['allnotenum'] = $space['allnotenum'] + $space[$value];
+	}
+	capi_showmessage_by_data('login_success',  0, array("m_auth"=>rawurlencode($auth), 'uhash'=> $_SGLOBAL['uhash']/* ç”¨äºŽæ³¨é”€ */, "formhash"=>formhash(), "space"=>$space));
 }
 
 $membername = empty($_SCOOKIE['loginuser'])?'':sstripslashes($_SCOOKIE['loginuser']);
 $cookiecheck = ' checked';
 
-include template('do_login');
+//include template('do_login');
 
 ?>

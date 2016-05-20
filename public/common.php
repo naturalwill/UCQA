@@ -6,9 +6,13 @@
 
 @define('IN_UCHOME', TRUE);
 define('D_BUG', '0');
+//是否每次都自动更新模板缓存
+define('Flash_Template', 0);
 
 D_BUG?error_reporting(7):error_reporting(0);
-set_magic_quotes_runtime(0);
+if(get_magic_quotes_runtime()){
+	set_magic_quotes_runtime(0);
+}
 
 $_SGLOBAL = $_SCONFIG = $_SBLOCK = $_TPL = $_SCOOKIE = $_SN = $space = array();
 
@@ -22,6 +26,7 @@ if(!@include_once(S_ROOT.'./config.php')) {
 	exit();
 }
 include_once(S_ROOT.'./source/function_common.php');
+include_once(S_ROOT.'../vendor/autoload.php');
 
 //时间
 $mtime = explode(' ', microtime());

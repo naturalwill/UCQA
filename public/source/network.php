@@ -307,9 +307,11 @@ function check_network_cache($type) {
 	
 	if($_SGLOBAL['network'][$type]['cache']) {
 		$cachefile = S_ROOT.'./data/cache_network_'.$type.'.txt';
-		$ftime = filemtime($cachefile);
-		if($_SGLOBAL['timestamp'] - $ftime < $_SGLOBAL['network'][$type]['cache']) {
-			return true;
+		if(file_exists($cachefile)){
+			$ftime = filemtime($cachefile);
+			if($_SGLOBAL['timestamp'] - $ftime < $_SGLOBAL['network'][$type]['cache']) {
+				return true;
+			}
 		}
 	}
 	return false;

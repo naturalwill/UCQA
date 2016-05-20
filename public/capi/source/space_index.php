@@ -13,7 +13,8 @@ if($space['namestatus']) {
 	include_once(S_ROOT.'./source/function_cp.php');
 	if(!ckrealname('viewspace', 1)) {
 		$_SGLOBAL['realname_privacy'] = 1;
-		include template('space_privacy');
+		//include template('space_privacy');
+		capi_showmessage_by_data('space_privacy');
 		exit();
 	}
 }
@@ -124,6 +125,23 @@ if($space['blognum'] && ckprivacy('blog')) {
 		}
 	}
 	$blognum = count($bloglist);
+}
+//вия╞
+$bwztlist = array();
+if($space['bwztnum'] && ckprivacy('bwzt')) {
+	$query = $_SGLOBAL['db']->query("SELECT b.uid, b.bwztid, b.subject, b.dateline, b.pic, b.picflag, b.viewnum, b.replynum, b.friend, b.password, bf.message, bf.target_ids
+		FROM ".tname('bwzt')." b
+		LEFT JOIN ".tname('bwztfield')." bf ON bf.bwztid=b.bwztid
+		WHERE b.uid='$space[uid]'
+		ORDER BY b.dateline DESC LIMIT 0,5");
+	while ($value = $_SGLOBAL['db']->fetch_array($query)) {
+		if(ckfriend($value['uid'], $value['friend'], $value['target_ids'])) {
+			if($value['pic']) $value['pic'] = pic_cover_get($value['pic'], $value['picflag']);
+			$value['message'] = $value['friend']==4?'':getstr($value['message'], 150, 0, 0, 0, 0, -1);
+			$bwztlist[] = $value;
+		}
+	}
+	$bwztnum = count($bwztlist);
 }
 
 //оЮ╡А
@@ -274,8 +292,8 @@ $_SGLOBAL['ad'] = array();
 $_GET['view'] = 'me';
 
 $_TPL['css'] = 'space';
-include_once template("space_index");
-
+//include_once template("space_index");
+capi_showmessage_by_data('do_success', 0, array("space"=>$space));
 //╬╨╪шеецШ
 function show_credit() {
 	global $_SGLOBAL, $space;

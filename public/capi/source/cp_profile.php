@@ -16,7 +16,7 @@ $theurl = "cp.php?ac=profile&op=$_GET[op]";
 
 if($_GET['op'] == 'base') {
 	
-	if(submitcheck('profilesubmit') || submitcheck('nextsubmit')) {
+	if(capi_submitcheck('profilesubmit')) {
 		
 		if(!@include_once(S_ROOT.'./data/data_profilefield.php')) {
 			include_once(S_ROOT.'./source/function_cache.php');
@@ -45,7 +45,7 @@ if($_GET['op'] == 'base') {
 			if($value['formtype'] == 'select') $value['maxsize'] = 255;
 			$setarr['field_'.$field] = getstr($_POST['field_'.$field], $value['maxsize'], 1, 1);
 			if($value['required'] && empty($setarr['field_'.$field])) {
-				showmessage('field_required', '', 1, array($value['title']));
+				capi_showmessage_by_data('field_required', 1, array('title'=>$value['title']));
 			}
 		}
 		
@@ -73,7 +73,7 @@ if($_GET['op'] == 'base') {
 		}
 	
 		if($setarr['name'] && strlen($setarr['name']) < 4) {//不能小于4个字符			
-			showmessage('realname_too_short');
+			capi_showmessage_by_data('realname_too_short');
 		}
 		if($setarr['name'] != $space['name'] || $setarr['namestatus']) {
 			
@@ -95,13 +95,13 @@ if($_GET['op'] == 'base') {
 					if($space['experience'] >= $reward['experience']) {
 						$setarr['experience'] = $space['experience'] - $reward['experience'];
 					} else {
-						showmessage('experience_inadequate', '', 1, array($space['experience'], $reward['experience']));
+						capi_showmessage_by_data('experience_inadequate', 1, array('space_experience'=>$space['experience'], 'reward_experience'=>$reward['experience']));
 					}
 				
 					if($space['credit'] >= $reward['credit']) {
 						$setarr['credit'] = $space['credit'] - $reward['credit'];
 					} else {
-						showmessage('integral_inadequate', '', 1, array($space['credit'],  $reward['credit']));
+						capi_showmessage_by_data('integral_inadequate', 1, array('space_credit' => $space['credit'], 'reward_credit' => $reward['credit']));
 					}
 				}
 			}
@@ -118,12 +118,7 @@ if($_GET['op'] == 'base') {
 			feed_add('profile', cplang('feed_profile_update_base'));
 		}
 	
-		if(submitcheck('nextsubmit')) {
-			$url = 'cp.php?ac=profile&op=contact';
-		} else {
-			$url = 'cp.php?ac=profile&op=base';
-		}
-		showmessage('update_on_successful_individuals', $url);
+		capi_showmessage_by_data('update_on_successful_individuals', 0);
 	}
 
 	//性别
@@ -203,10 +198,10 @@ if($_GET['op'] == 'base') {
 		//重新发送邮箱验证
 		$toemail = $space['newemail']?$space['newemail']:$space['email'];
 		emailcheck_send($space['uid'], $toemail);
-		showmessage('do_success', "cp.php?ac=profile&op=contact");
+		capi_showmessage_by_data('do_success', 0, array('url'=> "cp.php?ac=profile&op=contact"));
 	}
 	
-	if(submitcheck('profilesubmit') || submitcheck('nextsubmit')) {
+	if(capi_submitcheck('profilesubmit')) {
 		//提交检查
 		$setarr = array(
 			'mobile' => getstr($_POST['mobile'], 40, 1, 1),
@@ -221,13 +216,13 @@ if($_GET['op'] == 'base') {
 			//检查邮箱唯一性
 			if($_SCONFIG['uniqueemail']) {
 				if(getcount('spacefield', array('email'=>$newemail, 'emailcheck'=>1))) {
-					showmessage('uniqueemail_check');
+					capi_showmessage_by_data('uniqueemail_check');
 				}
 			}
 			
 			//验证密码
 			if(!$passport = getpassport($_SGLOBAL['supe_username'], $_POST['password'])) {
-				showmessage('password_is_not_passed');
+				capi_showmessage_by_data('password_is_not_passed');
 			}
 			
 			//邮箱修改
@@ -271,13 +266,8 @@ if($_GET['op'] == 'base') {
 		if(ckprivacy('profile', 1)) {
 			feed_add('profile', cplang('feed_profile_update_contact'));
 		}
-		
-		if(submitcheck('nextsubmit')) {
-			$url = 'cp.php?ac=profile&op=edu';
-		} else {
-			$url = 'cp.php?ac=profile&op=contact';
-		}
-		showmessage('update_on_successful_individuals', $url);
+
+		capi_showmessage_by_data('update_on_successful_individuals', 0);
 	}
 	
 	//隐私
@@ -296,7 +286,7 @@ if($_GET['op'] == 'base') {
 		}
 	}
 	
-	if(submitcheck('profilesubmit') || submitcheck('nextsubmit')) {
+	if(capi_submitcheck('profilesubmit')) {
 		//提交检查
 		$inserts = array();
 		foreach ($_POST['title'] as $key => $value) {
@@ -322,12 +312,7 @@ if($_GET['op'] == 'base') {
 			feed_add('profile', cplang('feed_profile_update_edu'));
 		}
 
-		if(submitcheck('nextsubmit')) {
-			$url = 'cp.php?ac=profile&op=work';
-		} else {
-			$url = 'cp.php?ac=profile&op=edu';
-		}
-		showmessage('update_on_successful_individuals', $url);
+		capi_showmessage_by_data('update_on_successful_individuals', 0);
 	}
 	
 	//当前已经设置的学校
@@ -348,7 +333,7 @@ if($_GET['op'] == 'base') {
 		}
 	}
 	
-	if(submitcheck('profilesubmit') || submitcheck('nextsubmit')) {
+	if(capi_submitcheck('profilesubmit')) {
 		//提交检查
 		$inserts = array();
 		foreach ($_POST['title'] as $key => $value) {
@@ -379,13 +364,7 @@ if($_GET['op'] == 'base') {
 			feed_add('profile', cplang('feed_profile_update_work'));
 		}
 
-
-		if(submitcheck('nextsubmit')) {
-			$url = 'cp.php?ac=profile&op=info';
-		} else {
-			$url = 'cp.php?ac=profile&op=work';
-		}
-		showmessage('update_on_successful_individuals', $url);
+		capi_showmessage_by_data('update_on_successful_individuals', 0);
 	}
 	
 	//当前已经设置
@@ -398,7 +377,7 @@ if($_GET['op'] == 'base') {
 	
 } elseif ($_GET['op'] == 'info') {
 	
-	if(submitcheck('profilesubmit')) {
+	if(capi_submitcheck('profilesubmit')) {
 		
 		$inserts = array();
 		foreach ($_POST['info'] as $key => $value) {
@@ -426,7 +405,7 @@ if($_GET['op'] == 'base') {
 
 
 		$url = 'cp.php?ac=profile&op=info';
-		showmessage('update_on_successful_individuals', $url);
+		capi_showmessage_by_data('update_on_successful_individuals', 0);
 	}
 	
 	//隐私
@@ -456,6 +435,6 @@ if($_GET['op'] == 'edu' || $_GET['op'] == 'work') {
 	}
 }
 
-include template("cp_profile");
-
+//include template("cp_profile");
+capi_showmessage_by_data('do_success', 0, array('space'=>$space));
 ?>

@@ -15,24 +15,24 @@ if($eventid){
 	$query = $_SGLOBAL['db']->query("SELECT e.*, ef.* FROM ".tname("event")." e LEFT JOIN ".tname("eventfield")." ef ON e.eventid=ef.eventid WHERE e.eventid='$_GET[eventid]'");
 	$event = $_SGLOBAL['db']->fetch_array($query);
 	if(empty($event)){
-		showmessage('event_does_not_exist');
+		capi_showmessage_by_data('event_does_not_exist');
 	}
 	if($event['grade'] == -2) {
-		showmessage('event_is_closed');
+		capi_showmessage_by_data('event_is_closed');
 	} elseif ($event['grade'] < 1) {
-		showmessage('event_under_verify');
+		capi_showmessage_by_data('event_under_verify');
 	}
 	$query = $_SGLOBAL['db']->query("SELECT * FROM " . tname("userevent") . " WHERE uid = '$_SGLOBAL[supe_uid]' AND eventid = '$eventid'");
 	$userevent = $_SGLOBAL['db']->fetch_array($query);
 	if($event['allowpic'] == 0 && $userevent['status'] < 3){
-		showmessage('event_only_allows_admins_to_upload');
+		capi_showmessage_by_data('event_only_allows_admins_to_upload');
 	}
 	if($event['allowpic'] && $userevent['status'] < 2) {
-	    showmessage("event_only_allows_members_to_upload");
+	    capi_showmessage_by_data("event_only_allows_members_to_upload");
     }
 }
 
-if(submitcheck('albumsubmit')) {
+if(capi_submitcheck('albumsubmit')) {
 	//创建相册
 	if($_POST['albumop'] == 'creatalbum') {
 		$_POST['albumname'] = empty($_POST['albumname'])?'':getstr($_POST['albumname'], 50, 1, 1);
@@ -96,7 +96,7 @@ if(submitcheck('albumsubmit')) {
 	$_POST['topicid'] = topic_check($_POST['topicid'], 'pic');
 	
 	if($_SGLOBAL['mobile']) {
-		showmessage('do_success', 'cp.php?ac=upload');
+		capi_showmessage_by_data('do_success', 'cp.php?ac=upload');
 	} else {
 		echo "<script>";
 		echo "parent.no_insert = 1;";
@@ -107,14 +107,14 @@ if(submitcheck('albumsubmit')) {
 	}
 	exit();
 
-} elseif(submitcheck('uploadsubmit')) {
+} elseif(capi_submitcheck('uploadsubmit')) {
 
 	//上传图片
 	$albumid = $picid = 0;
 
 	if(!checkperm('allowupload')) {
 		if($_SGLOBAL['mobile']) {
-			showmessage(cplang('not_allow_upload'));
+			capi_showmessage_by_data(cplang('not_allow_upload'));
 		} else {
 			echo "<script>";
 			echo "alert(\"".cplang('not_allow_upload')."\")";
@@ -141,9 +141,9 @@ if(submitcheck('albumsubmit')) {
 
 	if($_SGLOBAL['mobile']) {
 		if($picid) {
-			showmessage('do_success', "space.php?do=album&picid=$picid");
+			capi_showmessage_by_data('do_success', "space.php?do=album&picid=$picid");
 		} else {
-			showmessage($uploadStat, 'cp.php?ac=upload');
+			capi_showmessage_by_data($uploadStat, 'cp.php?ac=upload');
 		}
 	} else {
 		echo "<script>";
@@ -156,7 +156,54 @@ if(submitcheck('albumsubmit')) {
 	}
 	exit();
 
-} elseif(submitcheck('viewAlbumid')) {
+} elseif(capi_submitcheck('uploadsubmit2')) {
+
+	
+	//上传图片
+	$albumid = $picid = 0;
+
+	if(!checkperm('allowupload')) {
+		if($_SGLOBAL['mobile']) {
+			capi_showmessage_by_data(cplang('not_allow_upload'));
+		} else {
+			echo "<script>";
+			echo "alert(\"".cplang('not_allow_upload')."\")";
+			echo "</script>";
+			exit();
+		}
+	}
+
+	//上传
+	$_REQUEST['topicid'] = topic_check($_REQUEST['topicid'], 'pic');
+	
+	$uploadfiles = pic_save($_FILES['attach'], $_REQUEST['albumid'], $_REQUEST['pic_title'], $_REQUEST['topicid']);
+	
+	if($uploadfiles && is_array($uploadfiles)) {
+		$albumid = $uploadfiles['albumid'];
+		$picid = $uploadfiles['picid'];
+		$uploadStat = 1;
+		if($eventid){
+            $arr = array("eventid"=>$eventid, "picid" =>$picid, "uid"=>$_SGLOBAL['supe_uid'], "username"=>$_SGLOBAL['supe_username'], "dateline"=>$_SGLOBAL['timestamp']);
+            inserttable("eventpic", $arr);
+		}
+	} else {
+		$uploadStat = $uploadfiles;
+	}
+
+	if($_SGLOBAL['mobile']) {
+		if($picid) {
+			$uploadfiles['pic'] = pic_get($uploadfiles['filepath'], $uploadfiles['thumb'], $uploadfiles['remote']);
+			capi_showmessage_by_data('do_success',0, array("pic"=>$uploadfiles));
+		} else {
+			capi_showmessage_by_data('rest_error', 1, array("stat"=>$uploadStat));
+		}
+	} else {
+		$uploadfiles['pic'] = pic_get($uploadfiles['filepath'], $uploadfiles['thumb'], $uploadfiles['remote']);
+		capi_showmessage_by_data('do_success',0, array("pic"=>$uploadfiles));
+	}
+	exit();
+
+}elseif(capi_submitcheck('viewAlbumid')) {
 	
 	//上传完成发送feed
 	if($eventid){//跳到活动页面
@@ -193,13 +240,13 @@ if(submitcheck('albumsubmit')) {
 		} else {
 			$url = "space.php?uid=$_SGLOBAL[supe_uid]&do=album&id=".(empty($_POST['opalbumid'])?-1:$_POST['opalbumid']);
 		}
-		showmessage('upload_images_completed', $url, 0);
+		capi_showmessage_by_data('upload_images_completed', $url, 0);
 	}
 } else {
 	
 	if(!checkperm('allowupload')) {
 		ckspacelog();
-		showmessage('no_privilege');
+		capi_showmessage_by_data('no_privilege');
 	}
 	//实名认证
 	ckrealname('album');

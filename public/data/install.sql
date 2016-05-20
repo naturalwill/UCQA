@@ -235,21 +235,22 @@ CREATE TABLE uchome_clickuser (
 -- 表的结构 'uchome_comment'
 --
 
-CREATE TABLE uchome_comment (
-  cid mediumint(8) unsigned NOT NULL auto_increment,
-  uid mediumint(8) unsigned NOT NULL default '0',
-  id mediumint(8) unsigned NOT NULL default '0',
-  idtype varchar(20) NOT NULL default '',
-  authorid mediumint(8) unsigned NOT NULL default '0',
-  author varchar(15) NOT NULL default '',
-  ip varchar(20) NOT NULL default '',
-  dateline int(10) unsigned NOT NULL default '0',
-  message text NOT NULL,
-  magicflicker tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (cid),
-  KEY authorid (authorid, idtype),
-  KEY id (id, idtype, dateline)
-) ENGINE=MyISAM;
+CREATE TABLE `uchome_comment` (
+ `cid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+ `refercid` mediumint(9) unsigned NOT NULL DEFAULT '0',
+ `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+ `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+ `idtype` varchar(20) NOT NULL DEFAULT '',
+ `authorid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+ `author` varchar(15) NOT NULL DEFAULT '',
+ `ip` varchar(20) NOT NULL DEFAULT '',
+ `dateline` int(10) unsigned NOT NULL DEFAULT '0',
+ `message` text NOT NULL,
+ `magicflicker` tinyint(1) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`cid`),
+ KEY `authorid` (`authorid`,`idtype`),
+ KEY `id` (`id`,`idtype`,`dateline`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -1177,6 +1178,7 @@ CREATE TABLE uchome_space (
   regip char(15) NOT NULL default '',
   ip int(10) unsigned NOT NULL default '0',
   mood smallint(6) unsigned NOT NULL default '0',
+  `bwztnum` smallint(6) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY  (uid),
   KEY username (username),
   KEY domain (domain),
@@ -1300,6 +1302,8 @@ CREATE TABLE uchome_stat (
   wall smallint(6) unsigned NOT NULL default '0',
   poke smallint(6) unsigned NOT NULL default '0',
   click smallint(6) unsigned NOT NULL default '0',
+  `bwzt` smallint(6) unsigned NOT NULL DEFAULT '0',
+  bwztcomment smallint(6) unsigned NOT NULL default '0',
   PRIMARY KEY  (daytime)
 ) ENGINE=MyISAM;
 
@@ -1329,6 +1333,7 @@ CREATE TABLE uchome_tag (
   dateline int(10) unsigned NOT NULL default '0',
   blognum smallint(6) unsigned NOT NULL default '0',
   `close` tinyint(1) NOT NULL default '0',
+  `bwztnum` smallint(6) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY  (tagid),
   KEY tagname (tagname)
 ) ENGINE=MyISAM;
@@ -1618,6 +1623,8 @@ CREATE TABLE uchome_usergroup (
   managevideophoto tinyint(1) NOT NULL default '0',
   managelog tinyint(1) NOT NULL default '0',
   magicaward text NOT NULL,
+  `allowbwzt` tinyint(1) NOT NULL DEFAULT '0',
+  `managebwzt` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY  (gid)
 ) ENGINE=MyISAM;
 
@@ -1681,3 +1688,114 @@ CREATE TABLE uchome_visitor (
   KEY dateline (uid,dateline)
 ) ENGINE=MyISAM;
 
+-- --------------------------------------------------------
+
+
+-- --------------------------------------------------------
+-- new
+-- --------------------------------------------------------
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `uchome_bwzt`
+--
+
+CREATE TABLE IF NOT EXISTS `uchome_bwzt` (
+  `bwztid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `topicid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `username` char(15) NOT NULL DEFAULT '',
+  `subject` char(80) NOT NULL DEFAULT '',
+  `bwztclassid` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `bwztdivisionid` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `sex` char(2) NOT NULL DEFAULT '女',
+  `age` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `viewnum` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `replynum` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `hot` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `dateline` int(10) unsigned NOT NULL DEFAULT '0',
+  `pic` char(120) NOT NULL DEFAULT '',
+  `picflag` tinyint(1) NOT NULL DEFAULT '0',
+  `noreply` tinyint(1) NOT NULL DEFAULT '0',
+  `friend` tinyint(1) NOT NULL DEFAULT '0',
+  `password` char(10) NOT NULL DEFAULT '',
+  `click_1` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `click_2` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `click_3` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `click_4` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `click_5` smallint(6) unsigned NOT NULL DEFAULT '0',
+  `status` tinyint(1) NOT NULL DEFAULT '0',
+  `pics` text NOT NULL ,
+  PRIMARY KEY (`bwztid`),
+  KEY `uid` (`uid`,`dateline`),
+  KEY `topicid` (`topicid`,`dateline`),
+  KEY `dateline` (`dateline`)
+) ENGINE=MyISAM;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `uchome_bwztclass`
+--
+
+CREATE TABLE IF NOT EXISTS `uchome_bwztclass` (
+  `bwztclassid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `bwztclassname` char(40) NOT NULL DEFAULT '',
+  `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `dateline` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`bwztclassid`),
+  KEY `uid` (`uid`)
+) ENGINE=MyISAM;
+
+--
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `uchome_bwztdivision`
+--
+
+CREATE TABLE IF NOT EXISTS `uchome_bwztdivision` (
+  `bwztdivisionid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `bwztdivisionname` char(40) NOT NULL DEFAULT '',
+  `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `dateline` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`bwztdivisionid`)
+) ENGINE=MyISAM;
+
+--
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `uchome_bwztfield`
+--
+
+CREATE TABLE IF NOT EXISTS `uchome_bwztfield` (
+  `bwztid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `uid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `tag` varchar(255) NOT NULL DEFAULT '',
+  `message` mediumtext NOT NULL,
+  `postip` varchar(20) NOT NULL DEFAULT '',
+  `related` text NOT NULL,
+  `relatedtime` int(10) unsigned NOT NULL DEFAULT '0',
+  `target_ids` text NOT NULL,
+  `hotuser` text NOT NULL,
+  `magiccolor` tinyint(6) NOT NULL DEFAULT '0',
+  `magicpaper` tinyint(6) NOT NULL DEFAULT '0',
+  `magiccall` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`bwztid`)
+) ENGINE=MyISAM;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `uchome_tagbwzt`
+--
+
+CREATE TABLE IF NOT EXISTS `uchome_tagbwzt` (
+  `tagid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `bwztid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`tagid`,`bwztid`)
+) ENGINE=MyISAM;
+
+-- --------------------------------------------------------

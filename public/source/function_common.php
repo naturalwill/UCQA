@@ -883,6 +883,15 @@ function template($name) {
 			$tpl = "template/$_SCONFIG[template]/$name";
 		}
 		$objfile = S_ROOT.'./data/tpl_cache/'.str_replace('/','_',$tpl).'.php';
+		// if(!file_exists($objfile)) {
+			// include_once(S_ROOT.'./source/function_template.php');
+			// parse_template($tpl);
+		// }
+		//新添加,可控制是否自动刷新模板
+		if(Flash_Template==1){
+			include_once(S_ROOT.'./source/function_template.php');
+			parse_template($tpl);
+		}
 		if(!file_exists($objfile)) {
 			include_once(S_ROOT.'./source/function_template.php');
 			parse_template($tpl);
@@ -1500,7 +1509,7 @@ function mkfeed($feed, $actors=array()) {
 	}
 
 	//管理
-	if(in_array($feed['idtype'], array('blogid','picid','sid','pid','eventid'))) {
+	if(in_array($feed['idtype'], array('blogid','picid','sid','pid','eventid','bwztid'))) {
 		$feed['showmanage'] = 1;
 	}
 	
@@ -1566,8 +1575,19 @@ function avatar($uid, $size='small', $returnsrc = FALSE) {
 	
 	$size = in_array($size, array('big', 'middle', 'small')) ? $size : 'small';
 	$avatarfile = avatar_file($uid, $size);
-	return $returnsrc ? UC_API.'/data/avatar/'.$avatarfile : '<img src="'.UC_API.'/data/avatar/'.$avatarfile.'" onerror="this.onerror=null;this.src=\''.UC_API.'/images/noavatar_'.$size.'.gif\'">';
+	$avatarurl=UC_API.'/data/avatar/'.$avatarfile;
+	$noavatarurl=UC_API.'/images/noavatar_'.$size.'.gif';
+	return $returnsrc ? $avatarurl : '<img src="'.$avatarurl.'" onerror="this.onerror=null;this.src=\''.$noavatarurl.'\'">';
 }
+
+//处理头像
+function avatar_default($size='small') {
+	global $_SCONFIG, $_SN;
+	$size = in_array($size, array('big', 'middle', 'small')) ? $size : 'small';
+	$noavatarurl=UC_API.'/images/noavatar_'.$size.'.gif';
+	return $noavatarurl ;
+}
+
 
 //得到头像
 function avatar_file($uid, $size) {
@@ -2108,7 +2128,7 @@ function topic_get($topicid) {
 	global $_SGLOBAL;
 	$topic = array();
 	if($topicid) {
-		$typearr = array('blog','pic','thread','poll','event','share');
+		$typearr = array('blog','pic','thread','poll','event','share','bwzt');
 		$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('topic')." WHERE topicid='$topicid'");
 		if($topic = $_SGLOBAL['db']->fetch_array($query)) {
 			$topic['pic'] = $topic['pic']?pic_get($topic['pic'], $topic['thumb'], $topic['remote'], 0):'';
@@ -2158,6 +2178,35 @@ function ckspacelog() {
 		$expiration = sgmdate('Y-m-d H:i', $value['expiration']);
 		showmessage('no_authority_expiration'.($value['expiration']?'_date':''), '', 1, array($expiration));
 	}
+}
+
+
+function my_curl($url, $data=array(),$cookie='', $timeout = 20)
+{
+    $ssl = substr($url, 0, 5) == "https" ? TRUE : FALSE;
+    $ch = curl_init();
+    $opt = array(
+            CURLOPT_URL     => $url,
+            CURLOPT_HEADER  => 0,
+            CURLOPT_RETURNTRANSFER  => 1,
+            CURLOPT_TIMEOUT         => $timeout,
+            );
+	if(!empty($data)){
+		$opt[CURLOPT_POST ]       = 1;
+		$opt[CURLOPT_POSTFIELDS ] = $data;
+	}
+	if(!empty($cookie)){
+		$opt[CURLOPT_COOKIE]      = $cookie;		
+	}
+    if ($ssl)
+    {
+        //$opt[CURLOPT_SSL_VERIFYHOST] = 1;
+        $opt[CURLOPT_SSL_VERIFYPEER] = FALSE;
+    }
+    curl_setopt_array($ch, $opt);
+    $result = curl_exec($ch);
+    curl_close($ch);
+    return $result;
 }
 
 ?>

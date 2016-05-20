@@ -13,10 +13,12 @@ $op = empty($_GET['op'])?'':trim($_GET['op']);
 if($op == 'logout') {
 	
 	if($_GET['uhash'] == $_SGLOBAL['uhash']) {
+		$show=array();
 		//删除session
 		if($_SGLOBAL['supe_uid']) {
 			$_SGLOBAL['db']->query("DELETE FROM ".tname('session')." WHERE uid='$_SGLOBAL[supe_uid]'");
 			$_SGLOBAL['db']->query("DELETE FROM ".tname('adminsession')." WHERE uid='$_SGLOBAL[supe_uid]'");//管理平台
+			$show['unset_session']=TRUE;
 		}
 	
 		if($_SCONFIG['uc_status']) {
@@ -25,18 +27,20 @@ if($op == 'logout') {
 		} else {
 			$ucsynlogout = '';
 		}
+		$show['ucsynlogout']=$ucsynlogout;
 	
 		clearcookie();
 		ssetcookie('_refer', '');
+		capi_showmessage_by_data('security_exit', 0,  $show);
 	}
-	showmessage('security_exit', 'index.php', 1, array($ucsynlogout));
+	capi_showmessage_by_data('non_normal_operation');
 
 } elseif($op == 'seccode') {
 
 	if(ckseccode(trim($_GET['code']))) {
-		showmessage('succeed');
+		capi_showmessage_by_data('succeed');
 	} else {
-		showmessage('incorrect_code');
+		capi_showmessage_by_data('incorrect_code');
 	}
 
 } elseif($op == 'report') {
@@ -45,19 +49,19 @@ if($op == 'logout') {
 	$_GET['id'] = intval($_GET['id']);
 	$uidarr = $report = array();
 	
-	if(!in_array($_GET['idtype'], array('picid', 'blogid', 'albumid', 'tagid', 'tid', 'sid', 'uid', 'pid', 'eventid', 'comment', 'post')) || empty($_GET['id'])) {
-		showmessage('report_error');
+	if(!in_array($_GET['idtype'], array('picid', 'blogid', 'bwztid', 'albumid', 'tagid', 'tid', 'sid', 'uid', 'pid', 'eventid', 'comment', 'post')) || empty($_GET['id'])) {
+		capi_showmessage_by_data('report_error');
 	}
 	//获取举报记录
 	$query = $_SGLOBAL['db']->query("SELECT * FROM ".tname('report')." WHERE id='$_GET[id]' AND idtype='$_GET[idtype]'");
 	if($report = $_SGLOBAL['db']->fetch_array($query)) {
 		$uidarr = unserialize($report['uids']);
 		if($uidarr[$space['uid']]) {
-			showmessage('repeat_report');
+			capi_showmessage_by_data('repeat_report');
 		}
 	}
 
-	if(submitcheck('reportsubmit')) {
+	if(capi_submitcheck('reportsubmit')) {
 		$reason = getstr($_POST['reason'], 150, 1, 1);
 
 		$reason = "<li><strong><a href=\"space.php?uid=$space[uid]\" target=\"_blank\">$_SGLOBAL[supe_username]</a>:</strong> ".$reason.' ('.sgmdate('m-d H:i').')</li>';
@@ -81,12 +85,12 @@ if($op == 'logout') {
 			);
 			inserttable('report', $setarr);
 		}
-		showmessage('report_success');
+		capi_showmessage_by_data('report_success',0);
 	}
 
 	//判断是否是被忽略的举报
 	if(isset($report['num']) && $report['num'] < 1) {
-		showmessage('the_normal_information');
+		capi_showmessage_by_data('the_normal_information');
 	}
 
 	$reason = explode("\r\n", trim(preg_replace("/(\s*(\r\n|\n\r|\n|\r)\s*)/", "\r\n", data_get('reason'))));
@@ -107,7 +111,7 @@ if($op == 'logout') {
 			$space['privacy']['filter_note'][$type_uid] = $type_uid;
 			privacy_update();
 		}
-		showmessage('do_success', $_POST['refer']);
+		capi_showmessage_by_data('do_success', $_POST['refer']);
 	}
 	$formid = random(8);
 
@@ -134,9 +138,9 @@ if($op == 'logout') {
 	if($dir && file_exists(S_ROOT.'./template/'.$dir.'/style.css')) {
 		ssetcookie('mytemplate', $dir, 3600*24*365);//长期有效
 	}
-	showmessage('do_success', 'space.php?do=feed', 0);
+	capi_showmessage_by_data('do_success', 0, 'space.php?do=feed');
 }
 
-include template('cp_common');
+//include template('cp_common');
 
 ?>

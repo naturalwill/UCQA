@@ -371,6 +371,83 @@ class usercontrol extends base {
 			return '<?xml version="1.0" ?><root><face success="0"/></root>';
 		}
 	}
+	
+	function onuploadavatar4m() {
+		$this->init_input(getgpc('agent', 'G'));
+
+		$uid = $this->input('uid');
+		if(empty($uid)) {
+			//return -1;
+			capi_showmessage_by_data('ucenter_error',-1,array('error'=>'uid is empty'));
+		}
+		if(empty($_FILES['Filedata'])) {
+			//return -3;
+			capi_showmessage_by_data('ucenter_error',-3,array('error'=>'Filedata is empty'));
+		}
+		
+		list($width, $height, $type, $attr) = getimagesize($_FILES['Filedata']['tmp_name']);
+		$imgtype = array(1 => '.gif', 2 => '.jpg', 3 => '.png');
+		$filetype = $imgtype[$type];
+		if(!$filetype) $filetype = '.jpg';
+		$tmpavatar = UC_DATADIR.'./tmp/upload'.$uid.$filetype;
+		file_exists($tmpavatar) && @unlink($tmpavatar);
+		if(@copy($_FILES['Filedata']['tmp_name'], $tmpavatar) || @move_uploaded_file($_FILES['Filedata']['tmp_name'], $tmpavatar)) {
+			@unlink($_FILES['Filedata']['tmp_name']);
+			list($width, $height, $type, $attr) = getimagesize($tmpavatar);
+			if($width < 10 || $height < 10 || $type == 4) {
+				@unlink($tmpavatar);
+				//return -2;
+				capi_showmessage_by_data('ucenter_error',-2);
+			}
+		} else {
+			@unlink($_FILES['Filedata']['tmp_name']);
+			//return -4;
+			capi_showmessage_by_data('ucenter_error',-4);
+		}
+		$avatarurl = UC_DATADIR.'./tmp/upload'.$uid.$filetype;
+
+		$home = $this->get_home($uid);
+		if(!is_dir(UC_DATADIR.'./avatar/'.$home)) {
+			$this->set_home($uid, UC_DATADIR.'./avatar/');
+		}
+		$avatartype = getgpc('avatartype', 'G') == 'real' ? 'real' : 'virtual';
+		$bigavatarfile = UC_DATADIR.'./avatar/'.$this->get_avatar($uid, 'big', $avatartype);
+		$middleavatarfile = UC_DATADIR.'./avatar/'.$this->get_avatar($uid, 'middle', $avatartype);
+		$smallavatarfile = UC_DATADIR.'./avatar/'.$this->get_avatar($uid, 'small', $avatartype);
+	
+		
+			file_exists($bigavatarfile) && unlink($bigavatarfile);
+			file_exists($middleavatarfile) && unlink($middleavatarfile);
+			file_exists($smallavatarfile) && unlink($smallavatarfile);
+		resizeImage($avatarurl,200,200,$bigavatarfile);
+		resizeImage($avatarurl,120,120,$middleavatarfile);
+		resizeImage($avatarurl,48,48,$smallavatarfile);
+		
+
+		$success = 1;
+
+		$biginfo = @getimagesize($bigavatarfile);
+		$middleinfo = @getimagesize($middleavatarfile);
+		$smallinfo = @getimagesize($smallavatarfile);
+		if(!$biginfo || !$middleinfo || !$smallinfo || $biginfo[2] == 4 || $middleinfo[2] == 4 || $smallinfo[2] == 4) {
+			file_exists($bigavatarfile) && unlink($bigavatarfile);
+			file_exists($middleavatarfile) && unlink($middleavatarfile);
+			file_exists($smallavatarfile) && unlink($smallavatarfile);
+			$success = 0;
+		}
+
+		$filetype = '.jpg';
+		@unlink(UC_DATADIR.'./tmp/upload'.$uid.$filetype);
+
+		if($success) {
+			capi_showmessage_by_data('do_success',0);
+			// return '<?xml version="1.0" ? ><root><face success="1"/></root>';
+		} else {
+			capi_showmessage_by_data('ucenter_error');
+			//return '<?xml version="1.0" ? ><root><face success="0"/></root>';
+		}
+	}
+
 
 
 	function flashdata_decode($s) {
