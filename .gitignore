@@ -11,3 +11,4 @@
 /public/attachment/*
 !/public/attachment/index.htm
 /vendor
+/composer.lock
